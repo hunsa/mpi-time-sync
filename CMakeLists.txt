@@ -95,7 +95,7 @@ endif (HWLOC_FOUND)
 add_library(mpi_clock_sync SHARED  ${MPITS_LIBRARY_SRC_FILES})
 
 SET_TARGET_PROPERTIES(mpi_clock_sync PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries(mpi_clock_sync PUBLIC ${MPI_LIBRARIES} ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} MPI::MPI_CXX)
+target_link_libraries(mpi_clock_sync PUBLIC ${MPI_LIBRARIES} ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
 
 add_executable(cs1
     test/clock_sync/01-basic_usage/cs1.cpp
