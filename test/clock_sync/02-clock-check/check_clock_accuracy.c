@@ -4,19 +4,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//#include <time.h>
 #include <math.h>
 #include "mpi.h"
 
 #include <getopt.h>
 
-#include "mpi_clock_sync.h"
-#include "mpi_time_provider.h"
+#include "mpits.h"
 #include "clock_drift_utils.h"
-
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-//#define ZF_LOG_LEVEL ZF_LOG_WARN
-//#include "log/zf_log.h"
 
 typedef struct opt {
   int npp;   /* number of ping-pongs */

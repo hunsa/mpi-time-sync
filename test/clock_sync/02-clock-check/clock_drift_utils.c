@@ -6,10 +6,11 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
+#include <limits.h>
+#include <errno.h>
+#include <time.h>
 
 #include "clock_drift_utils.h"
-#include "mpi_time_provider.h"
-#include "mpits_helpers.h"
 
 //#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
 #define ZF_LOG_LEVEL ZF_LOG_WARN
@@ -134,7 +135,7 @@ double SKaMPIClockOffset_measure_offset(MPI_Comm comm, int ref_rank, int client_
   double return_offset = 0.0;
 
   double ping_pong_min_time; /* ping_pong_min_time is the minimum time of one ping_pong
-   between the root node and the , negative value means
+   between the root node and the negative value means
    time not yet determined;
    needed to avoid measuring again all the 100 RTTs when re-synchronizing
    (in this case only a few ping-pongs are performed if the RTT stays
@@ -250,4 +251,53 @@ double SKaMPIClockOffset_measure_offset(MPI_Comm comm, int ref_rank, int client_
   }
 
   return return_offset;
+}
+
+double mpits_min(double a, double b) {
+  return (a < b) ? a : b;
+}
+
+double mpits_max(double a, double b) {
+  return (a > b) ? a : b;
+}
+
+
+void mpits_shuffle(int *array, size_t n) {
+  srand(time(NULL));
+
+  if (n > 1) {
+    size_t i;
+    for (i = 0; i < n - 1; i++) {
+      size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+      int t = array[j];
+      array[j] = array[i];
+      array[i] = t;
+    }
+  }
+}
+
+
+int mpits_str_to_long(const char *str, long* result) {
+  char *endptr;
+  int error = 0;
+  long res;
+
+  errno = 0;
+  res = strtol(str, &endptr, 10);
+
+  /* Check for various possible errors */
+  if ((errno == ERANGE && (res == LONG_MAX || res == LONG_MIN)) || (errno != 0 && res == 0)) {
+    error = 1;
+  }
+  if (endptr == str) {  // no digits parsed
+    error = 1;
+  }
+  if (!error) {
+    *result = res;
+  }
+  else {
+    *result = 0;
+  }
+
+  return error;
 }

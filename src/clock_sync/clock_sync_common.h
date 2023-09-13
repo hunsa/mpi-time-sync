@@ -14,5 +14,4 @@ double default_get_normalized_time(double local_time, GlobalClock *global_clock)
 Clock *initialize_local_clock(void);
 
 
-
 #endif /* MPITS_CLOCK_SYNCHRONIZATION_COMMON_H_ */

@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.24)
 project(mpi_time_sync)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(MPI REQUIRED)
 
@@ -79,7 +81,6 @@ set(MPITS_LIBRARY_SRC_FILES
     src/clock_sync/sync_algorithms_adapters/no_sync.cpp
     src/clock_sync/sync_algorithms_adapters/sk_sync.cpp
     src/clock_sync/sync_algorithms_adapters/topo_aware_2l_sync.cpp
-    src/helpers/misc/misc_functions.c
 )
 
 if (HWLOC_FOUND)
@@ -92,29 +93,27 @@ if (HWLOC_FOUND)
     )
 endif (HWLOC_FOUND)
 
-add_library(mpi_clock_sync SHARED  ${MPITS_LIBRARY_SRC_FILES})
+add_library(mpits SHARED  ${MPITS_LIBRARY_SRC_FILES})
 
-SET_TARGET_PROPERTIES(mpi_clock_sync PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries(mpi_clock_sync PUBLIC ${MPI_LIBRARIES} ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
+SET_TARGET_PROPERTIES(mpits PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
+target_link_libraries(mpits PUBLIC ${MPI_LIBRARIES} ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
 
 add_executable(cs1
     test/clock_sync/01-basic_usage/cs1.cpp
 )
-TARGET_LINK_LIBRARIES(cs1 PRIVATE mpi_clock_sync MPI::MPI_CXX)
+TARGET_LINK_LIBRARIES(cs1 PRIVATE mpits MPI::MPI_CXX)
 
 add_executable(check_clock_accuracy
         test/clock_sync/02-clock-check/check_clock_accuracy.c
         test/clock_sync/02-clock-check/clock_drift_utils.c
 )
-TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpi_clock_sync MPI::MPI_CXX)
+TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)
 
-install(TARGETS mpi_clock_sync
+install(TARGETS mpits
         LIBRARY DESTINATION lib
         ARCHIVE DESTINATION lib
         RUNTIME DESTINATION bin)
 
 install(FILES
-        include/mpi_clock_sync.h
-        include/mpi_time_provider.h
-        include/mpits_helpers.h
+        include/mpits.h
         DESTINATION include)

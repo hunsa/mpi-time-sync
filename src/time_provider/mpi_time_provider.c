@@ -3,6 +3,7 @@
 //
 
 #include <mpi.h>
+#include "mpits.h"
 
 #if defined(ENABLE_GETTIME_REALTIME) || defined(ENABLE_GETTIME_MONOTONIC)
 #include <time.h>

@@ -2,7 +2,7 @@
 #ifndef CLOCK_SYNCHRONIZATION_LIB_H_
 #define CLOCK_SYNCHRONIZATION_LIB_H_
 
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 #include "clock_sync_common.h"
 
 #ifdef __cplusplus

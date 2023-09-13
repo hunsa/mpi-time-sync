@@ -4,10 +4,9 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 #include "helpers/dict/mpits_dict.h"
 #include "mpi_clock_sync_internal.h"
-#include "mpi_time_provider.h"
 
 #include "sync_algorithms_adapters/hca_sync.h"
 #include "sync_algorithms_adapters/jk_sync.h"

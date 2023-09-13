@@ -2,7 +2,7 @@
 #ifndef MPI_TIME_SYNC_JK_SYNC_H
 #define MPI_TIME_SYNC_JK_SYNC_H
 
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 
 #ifdef __cplusplus
 extern "C" {

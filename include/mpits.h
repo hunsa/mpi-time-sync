@@ -1,5 +1,5 @@
-#ifndef MPI_TIME_SYNC_MPI_CLOCK_SYNC_H
-#define MPI_TIME_SYNC_MPI_CLOCK_SYNC_H
+#ifndef MPI_TIME_SYNC_MPITS_H
+#define MPI_TIME_SYNC_MPITS_H
 
 #include <stdio.h>
 #include "mpi.h"
@@ -57,8 +57,10 @@ double MPITS_Clocksync_get_time(mpits_clocksync_t *clocksync);
 
 int MPITS_Finalize();
 
+double MPITS_get_time(void);
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif //MPI_TIME_SYNC_MPI_CLOCK_SYNC_H
+#endif //MPI_TIME_SYNC_MPITS_H

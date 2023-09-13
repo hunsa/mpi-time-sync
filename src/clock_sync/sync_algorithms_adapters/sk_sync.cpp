@@ -16,7 +16,7 @@
 #include <cstdlib>
 #include <mpi.h>
 
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 
 #include "time_provider/clocks/Clock.hpp"
 #include "time_provider/clocks/GlobalClockOffset.hpp"

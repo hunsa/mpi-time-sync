@@ -9,7 +9,7 @@
 extern "C" {
 #endif
 
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 
 void register_topo_aware_sync1_module(mpits_clocksync_t *sync_mod);
 

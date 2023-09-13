@@ -1,6 +1,6 @@
 
 #include "mpi.h"
-#include "mpi_clock_sync.h"
+#include "mpits.h"
 
 int main(int argc, char *argv[]) {
 
