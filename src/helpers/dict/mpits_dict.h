@@ -15,7 +15,7 @@ typedef void* mpits_map;
 
 mpits_map mpits_init_dictionary();
 void mpits_cleanup_dictionary(mpits_map map);
-int mpitsadd_element_to_dict(mpits_map map, const char* key, const char* val);
+int mpits_add_element_to_dict(mpits_map map, const char* key, const char* val);
 int mpits_get_value_from_dict(const mpits_map map, const char* key, char** value);
 int mpits_remove_element_from_dict(mpits_map map, const char* key);
 int mpits_get_keys_from_dict(const mpits_map map, char ***keys, int *nkeys);

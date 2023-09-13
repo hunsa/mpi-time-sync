@@ -4,12 +4,12 @@
 
 #include "mpits_dict.h"
 
-
 #include <map>
+#include <iostream>
 #include <cstdlib>
 
 struct MapWrapper {
-  std::map<const char*, const char*> data;
+  std::map<std::string, std::string> data;
 };
 
 mpits_map mpits_init_dictionary() {
@@ -21,12 +21,12 @@ void mpits_cleanup_dictionary(mpits_map map) {
   delete mw;
 }
 
-int mpitsadd_element_to_dict(mpits_map map, const char* key, const char* val) {
-  int not_okay = 1;
+int mpits_add_element_to_dict(mpits_map map, const char* key, const char* val) {
   MapWrapper* mw = (MapWrapper*)map;
-  mw->data[key] = val;
-  not_okay = 0;
-  return not_okay;
+  std::string key_s(key);
+  std::string val_s(val);
+  mw->data[key_s] = val_s;
+  return 0;
 }
 
 int mpits_get_value_from_dict(const mpits_map map, const char* key, char** value) {
@@ -35,7 +35,7 @@ int mpits_get_value_from_dict(const mpits_map map, const char* key, char** value
 
   if( mw->data.find(key) != mw->data.end() ) {
     not_found = 0;
-    *value = (char*)mw->data[key];
+    *value = (char*)mw->data[key].c_str();
   } else {
     *value = NULL;
   }
@@ -64,7 +64,7 @@ int mpits_get_keys_from_dict(const mpits_map map, char ***keys, int *nkeys) {
 
     int key_cnt = 0;
     for (const auto& pair : mw->data) {
-      (*keys)[key_cnt++] = (char*)pair.first;
+      (*keys)[key_cnt++] = (char*)pair.first.c_str();
     }
     not_okay = 0;
   }
@@ -87,6 +87,11 @@ int mpits_dict_has_key(const mpits_map map, const char *key) {
 }
 
 void mpits_print_dictionary(const mpits_map map, FILE* f) {
+  MapWrapper* mw = (MapWrapper*)map;
+  for (const auto& pair : mw->data) {
+    std::cout << "key: " << pair.first << " value: " << pair.second << std::endl;
+  }
+
 
 }
 

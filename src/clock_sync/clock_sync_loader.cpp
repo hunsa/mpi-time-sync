@@ -20,14 +20,14 @@
 #include "clock_sync/sync_algorithms/offset/HCA3OffsetClockSync.hpp"
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 #include "helpers/dict/mpits_dict.h"
-#include "helpers/sync_module_helpers.h"
+#include "helpers/dict/cli_param_parser.h"
 //#include "clock_sync/clock_sync_common.h"
 //#include "clock_sync/clock_sync_lib.h"
 //#include "common/sync_module_helpers.h"
 
 
-#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-//#define ZF_LOG_LEVEL ZF_LOG_WARN
+//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
+#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 static std::vector<std::string> str_split(const char *str, char c);
@@ -84,15 +84,16 @@ static ClockOffsetAlg* instantiate_clock_offset_alg(std::vector<std::string> &to
 BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
   BaseClockSync* ret_sync = NULL;
   char *alg_str;
-  mpits_map *dict = get_global_param_store();
   int rank;
 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
 
-  //ZF_LOGV("instantiate clock for %s", param_name);
+  ZF_LOGV("instantiate clock for '%s'", param_name);
 
-  if (mpits_dict_has_key(dict, param_name) == 1) {
-      mpits_get_value_from_dict(dict, param_name, &alg_str);
+  //mpits_print_dictionary(get_global_param_store(), stdout);
+
+  if (mpits_dict_has_key(get_global_param_store(), param_name) == 1) {
+      mpits_get_value_from_dict(get_global_param_store(), param_name, &alg_str);
 
       std::vector<std::string> tokens = str_split(alg_str, '@');
       free(alg_str);

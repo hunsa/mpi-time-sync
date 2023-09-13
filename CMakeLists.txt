@@ -48,6 +48,7 @@ set(MPITS_LIBRARY_SRC_FILES
     src/time_provider/mpi_time_provider.c
     src/clock_sync/mpi_clock_sync.cpp
     src/helpers/dict/mpits_dict.cpp
+    src/helpers/dict/cli_param_parser.cpp
     src/time_provider/clocks/GettimeClock.cpp
     src/time_provider/clocks/GlobalClock.cpp
     src/time_provider/clocks/GlobalClockLM.cpp
@@ -71,7 +72,6 @@ set(MPITS_LIBRARY_SRC_FILES
     src/clock_sync/clock_offset_algs/ClockOffsetAlg.cpp
     src/clock_sync/clock_offset_algs/PingpongClockOffsetAlg.cpp
     src/clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.cpp
-    src/helpers/sync_module_helpers.c
     src/clock_sync/sync_algorithms/utils/communicator_utils.cpp
     src/clock_sync/sync_algorithms/utils/sync_errors.cpp
     src/clock_sync/sync_algorithms/utils/sync_utils.cpp

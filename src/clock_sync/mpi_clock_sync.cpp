@@ -5,8 +5,9 @@
 #include <stdlib.h>
 
 #include "mpits.h"
-#include "helpers/dict/mpits_dict.h"
 #include "mpi_clock_sync_internal.h"
+#include "helpers/dict/mpits_dict.h"
+#include "helpers/dict/cli_param_parser.h"
 
 #include "sync_algorithms_adapters/hca_sync.h"
 #include "sync_algorithms_adapters/jk_sync.h"
@@ -20,8 +21,6 @@
 
 // Implemented synchronization modules
 static mpits_clocksync_t* sync_modules;
-
-mpits_map params_dict;
 
 void parse_sync_options(int argc, char **argv, const char* argument_name, sync_module_info_t* opts_p);
 void cleanup_sync_options(sync_module_info_t* opts_p) ;
@@ -98,6 +97,10 @@ char **mpits_make_argv_copy(int argc, char **argv)
 void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
   char *env = getenv("MPITS_PARAMS");
   char **argvnew;
+
+  if( env == NULL ) {
+    env = strdup("--clock-sync=HCA3O --params=alg:hca3offset@skampi_offset@5@20");
+  }
 
   if( env != NULL ) {
     char *token;
@@ -214,9 +217,10 @@ int MPITS_Init(int *argc, char ***argv, mpits_clocksync_t *clocksync, MPI_Comm c
   sync_module_info_t sync_module_info;
   int index;
 
-  mpits_check_and_override_lib_env_params(argc, argv);
-
   MPITS_register_sync_modules();
+
+  mpits_check_and_override_lib_env_params(argc, argv);
+  mpits_parse_extra_key_value_options(get_global_param_store(), *argc, *argv);
 
   parse_sync_options(*argc, *argv, CLOCK_SYNC_ARG, &sync_module_info);
   if (sync_module_info.name == NULL) {
