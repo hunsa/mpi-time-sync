@@ -11,7 +11,7 @@ find_package(MPI REQUIRED)
 include_directories(include src)
 include_directories(${MPI_INCLUDE_PATH})
 
-set(CMAKE_MODULE_PATH "cmake_modules")
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 SET(MY_COMPILE_FLAGS "")
 SET(MY_ADDITIONAL_LIBS "")
 
