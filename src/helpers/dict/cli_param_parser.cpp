@@ -64,7 +64,7 @@ static void parse_keyvalue_list(char* args, mpits_map dict) {
       if (key!=NULL && val!= NULL) {
         if (!mpits_dict_has_key(dict, key)) {
           ok = mpits_add_element_to_dict(dict, key, val);
-//          printf("add '%s' -> '%s'\n", key, val);
+          //printf("add '%s' -> '%s'\n", key, val);
           if (ok != 0) {
             exit_after_keyvalue_error("Cannot add parameter to dictionary");
           }

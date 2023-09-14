@@ -96,7 +96,7 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
       mpits_get_value_from_dict(get_global_param_store(), param_name, &alg_str);
 
       std::vector<std::string> tokens = str_split(alg_str, '@');
-      free(alg_str);
+
       if (tokens.size() <= 0) {
           ZF_LOGE("value of %s incompatible", param_name);
       } else {
