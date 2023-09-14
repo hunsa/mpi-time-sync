@@ -51,6 +51,8 @@ int MPITS_Clocksync_init(mpits_clocksync_t *clocksync);
 
 int MPITS_Clocksync_sync(mpits_clocksync_t *clocksync);
 
+int MPITS_Clocksync_resync(mpits_clocksync_t *clocksync);
+
 int MPITS_Clocksync_finalize(mpits_clocksync_t *clocksync);
 
 double MPITS_Clocksync_get_time(mpits_clocksync_t *clocksync);

@@ -251,6 +251,10 @@ int MPITS_Clocksync_sync(mpits_clocksync_t *clocksync) {
   return 0;
 }
 
+int MPITS_Clocksync_resync(mpits_clocksync_t *clocksync) {
+  return MPITS_Clocksync_sync(clocksync);
+}
+
 int MPITS_Clocksync_finalize(mpits_clocksync_t *clocksync) {
   MPITS_deregister_sync_modules();
   return 0;
