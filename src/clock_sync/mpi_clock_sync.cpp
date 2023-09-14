@@ -230,8 +230,8 @@ int MPITS_Init(int *argc, char ***argv, mpits_clocksync_t *clocksync, MPI_Comm c
 
   if (index < 0) {
     char err_msg[160];
-    sprintf(err_msg, "Unknown synchronization module \"--clock-sync=%s\"", sync_module_info.name);
-    fprintf(stderr, err_msg);
+    snprintf(err_msg, sizeof(err_msg), "Unknown synchronization module \"--clock-sync=%s\"", sync_module_info.name);
+    fprintf(stderr, "%s\n", err_msg);
   }
 
   *clocksync = sync_modules[index];
