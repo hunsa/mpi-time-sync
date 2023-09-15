@@ -176,7 +176,6 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
                 ret_sync = new HCA3OffsetClockSync(offset_alg);
               } else {
                 ZF_LOGE("problem with format of hca3offset clock offset alg\nuse hca3offset@offsetalg_format");
-
               }
             } else {
               ZF_LOGE("problem with format of hca3offset clock offset alg: sync alg '%s'\nuse hca3offset@offsetalg_format", sync_alg.c_str());
