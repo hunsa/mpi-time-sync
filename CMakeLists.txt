@@ -104,7 +104,7 @@ add_executable(cs1
 TARGET_LINK_LIBRARIES(cs1 PRIVATE mpits MPI::MPI_CXX)
 
 add_executable(check_clock_accuracy
-        test/clock_sync/02-clock-check/check_clock_accuracy.c
+        test/clock_sync/02-clock-check/check_clock_accuracy.cpp
         test/clock_sync/02-clock-check/clock_drift_utils.c
 )
 TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)

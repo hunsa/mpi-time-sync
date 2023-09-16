@@ -11,6 +11,9 @@
 
 #include "mpits.h"
 #include "clock_drift_utils.h"
+#include "time_provider/clocks/Clock.hpp"
+#include "clock_sync/clock_sync_common.h"
+#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
 typedef struct opt {
   int npp;   /* number of ping-pongs */
@@ -195,6 +198,11 @@ int main(int argc, char* argv[]) {
       all_global_times = (double*) calloc(ntestprocs * n_wait_steps, sizeof(double));
     }
 
+    int number_ping_pongs = opts.npp;
+
+    Clock *clock = initialize_local_clock();
+    SKaMPIClockOffsetAlg offset_alg(10,number_ping_pongs);
+
     MPITS_Init(&argc, &argv, &cs, MPI_COMM_WORLD);
     print_initial_settings(argc, argv, opts, cs.print_sync_info);
 
@@ -203,7 +211,6 @@ int main(int argc, char* argv[]) {
     MPITS_Clocksync_sync(&cs);
     runtime_s = MPITS_get_time() - runtime_s;
 
-    Number_ping_pongs = opts.npp;
 
     if (my_rank == master_rank) {
       double target_time = MPITS_Clocksync_get_time(&cs) + ((double)opts.steps);
@@ -217,8 +224,10 @@ int main(int argc, char* argv[]) {
       for (index = 0; index < ntestprocs; index++) {
         p = testprocs_list[index];    // select the process to exchange pingpongs with
         if (p != master_rank) {
-          all_global_times[offset * ntestprocs + index] = SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank,
-                                                                                           p, &cs);
+          all_global_times[offset * ntestprocs + index] =
+                  offset_alg.measure_offset(MPI_COMM_WORLD, master_rank, p, *clock)->get_offset();
+ //                 SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank,
+ //                                                                                          p, &cs);
         }
       }
 
@@ -242,7 +251,9 @@ int main(int argc, char* argv[]) {
       for (index = 0; index < ntestprocs; index++) {
         p = testprocs_list[index];    // select the process to exchange pingpongs with
         if (p != master_rank) {
-          all_global_times[offset * ntestprocs + index] = SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank, p, &cs);
+          all_global_times[offset * ntestprocs + index] =
+                  offset_alg.measure_offset(MPI_COMM_WORLD, master_rank, p, *clock)->get_offset();
+                  //SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank, p, &cs);
         }
       }
 
@@ -255,7 +266,8 @@ int main(int argc, char* argv[]) {
         for (index = 0; index < ntestprocs; index++) {
           p = testprocs_list[index];    // make sure the current rank is in the test list
           if (my_rank == p) {
-            SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank, p, &cs);
+              offset_alg.measure_offset(MPI_COMM_WORLD, master_rank, p, *clock);
+            //SKaMPIClockOffset_measure_offset(MPI_COMM_WORLD, master_rank, p, &cs);
           }
         }
       }

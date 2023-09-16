@@ -3,6 +3,7 @@
 #define MPITS_SKAMPI_CLOCKOFFSETALG_CLASS_H_
 
 #include <map>
+#include <string>
 #include <mpi.h>
 #include "ClockOffsetAlg.hpp"
 

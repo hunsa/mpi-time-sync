@@ -122,144 +122,144 @@ void generate_test_process_list(double process_ratio, int **testprocs_list_p, in
 #endif
 }
 
-double SKaMPIClockOffset_measure_offset(MPI_Comm comm, int ref_rank, int client_rank, mpits_clocksync_t *clock_sync) {
-  // SKaMPI pingpongs
-  int i; //, other_global_id;
-  double s_now, s_last, t_last, t_now;
-  double td_min, td_max;
-  double invalid_time = -1.0;
-  MPI_Status status;
-  int pp_tag = 43;
-  int my_rank;
+//double SKaMPIClockOffset_measure_offset(MPI_Comm comm, int ref_rank, int client_rank, mpits_clocksync_t *clock_sync) {
+//  // SKaMPI pingpongs
+//  int i; //, other_global_id;
+//  double s_now, s_last, t_last, t_now;
+//  double td_min, td_max;
+//  double invalid_time = -1.0;
+//  MPI_Status status;
+//  int pp_tag = 43;
+//  int my_rank;
+//
+//  double return_offset = 0.0;
+//
+//  double ping_pong_min_time; /* ping_pong_min_time is the minimum time of one ping_pong
+//   between the root node and the negative value means
+//   time not yet determined;
+//   needed to avoid measuring again all the 100 RTTs when re-synchronizing
+//   (in this case only a few ping-pongs are performed if the RTT stays
+//   within 110% for the ping_pong_min_time)
+//   */
+//
+//  MPI_Comm_rank(comm, &my_rank);
+//
+//  //printf("nb_ping_pongs: %d\n", Number_ping_pongs);
+//
+//  // check whether I am participating here
+//  // if not, there is no offset
+//  if (my_rank != client_rank && my_rank != ref_rank) {
+//    return 0.0;
+//  }
+//
+//  // check whether we have ping_pong_min_time in our hash
+//  // if so, take it and use it (can stop after min_n_ping_pong rounds)
+//  // if not, we set ping_pong_min_time to -1.0 (then we need to do n_ping_pongs rounds)
+//  //  int rank1;
+//  //  int rank2;
+//  //  if( ref_rank < client_rank ) {
+//  //    rank1 = ref_rank;
+//  //    rank2 = client_rank;
+//  //  } else {
+//  //    rank1 = client_rank;
+//  //    rank2 = ref_rank;
+//  //  }
+//
+//  ping_pong_min_time = -1.0;
+//
+//  /* I had to unroll the main loop because I didn't find a portable way
+//   to define the initial td_min and td_max with INFINITY and NINFINITY */
+//  if (my_rank == ref_rank) {
+//
+//    s_last = clock_sync->get_global_time(MPITS_get_time());
+//    MPI_Send(&s_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
+//    MPI_Recv(&t_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm, &status);
+//    s_now = clock_sync->get_global_time(MPITS_get_time());
+//    MPI_Send(&s_now, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
+//
+//    td_min = t_last - s_now;
+//    td_max = t_last - s_last;
+//
+//  } else {
+//    //other_global_id = ref_rank;
+//
+//    MPI_Recv(&s_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
+//    t_last = clock_sync->get_global_time(MPITS_get_time());
+//    MPI_Send(&t_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
+//    MPI_Recv(&s_now, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
+//    t_now = clock_sync->get_global_time(MPITS_get_time());
+//
+//    td_min = s_last - t_last;
+//    td_min = mpits_max(td_min, s_now - t_now);
+//
+//    td_max = s_now - t_last;
+//  }
+//  if (my_rank == ref_rank) {
+//    i = 1;
+//    while (1) {
+//
+//      MPI_Recv(&t_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm, &status);
+//      if (t_last < 0.0) {
+//        break;
+//      }
+//
+//      s_last = s_now;
+//      s_now = clock_sync->get_global_time(MPITS_get_time());
+//
+//      td_min = mpits_max(td_min, t_last - s_now);
+//      td_max = mpits_min(td_max, t_last - s_last);
+//
+//      if (ping_pong_min_time >= 0.0 && i >= Minimum_ping_pongs && s_now - s_last < ping_pong_min_time * 1.10) {
+//        MPI_Send(&invalid_time, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
+//        break;
+//      }
+//
+//      i++;
+//      if (i >= Number_ping_pongs) {
+//        MPI_Send(&invalid_time, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
+//        break;
+//      }
+//      MPI_Send(&s_now, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
+//
+//    }
+//  } else {
+//    i = 1;
+//    while (1) {
+//      MPI_Send(&t_now, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
+//      MPI_Recv(&s_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
+//      t_last = t_now;
+//      t_now = clock_sync->get_global_time(MPITS_get_time());
+//
+//      if (s_last < 0.0) {
+//        break;
+//      }
+//      td_min = mpits_max(td_min, s_last - t_now);
+//      td_max = mpits_min(td_max, s_last - t_last);
+//
+//      if (ping_pong_min_time >= 0.0 && i >= Minimum_ping_pongs && t_now - t_last < ping_pong_min_time * 1.10) {
+//        MPI_Send(&invalid_time, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
+//        break;
+//      }
+//      i++;
+//    }
+//  }
+//
+//  if (my_rank == ref_rank) {
+//    return_offset = (td_min + td_max) / 2.0;
+//  } else {
+//    return_offset = -(td_min + td_max) / 2.0;
+//  }
+//
+//  return return_offset;
+//}
 
-  double return_offset = 0.0;
-
-  double ping_pong_min_time; /* ping_pong_min_time is the minimum time of one ping_pong
-   between the root node and the negative value means
-   time not yet determined;
-   needed to avoid measuring again all the 100 RTTs when re-synchronizing
-   (in this case only a few ping-pongs are performed if the RTT stays
-   within 110% for the ping_pong_min_time)
-   */
-
-  MPI_Comm_rank(comm, &my_rank);
-
-  //printf("nb_ping_pongs: %d\n", Number_ping_pongs);
-
-  // check whether I am participating here
-  // if not, there is no offset
-  if (my_rank != client_rank && my_rank != ref_rank) {
-    return 0.0;
-  }
-
-  // check whether we have ping_pong_min_time in our hash
-  // if so, take it and use it (can stop after min_n_ping_pong rounds)
-  // if not, we set ping_pong_min_time to -1.0 (then we need to do n_ping_pongs rounds)
-  //  int rank1;
-  //  int rank2;
-  //  if( ref_rank < client_rank ) {
-  //    rank1 = ref_rank;
-  //    rank2 = client_rank;
-  //  } else {
-  //    rank1 = client_rank;
-  //    rank2 = ref_rank;
-  //  }
-
-  ping_pong_min_time = -1.0;
-
-  /* I had to unroll the main loop because I didn't find a portable way
-   to define the initial td_min and td_max with INFINITY and NINFINITY */
-  if (my_rank == ref_rank) {
-
-    s_last = clock_sync->get_global_time(MPITS_get_time());
-    MPI_Send(&s_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
-    MPI_Recv(&t_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm, &status);
-    s_now = clock_sync->get_global_time(MPITS_get_time());
-    MPI_Send(&s_now, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
-
-    td_min = t_last - s_now;
-    td_max = t_last - s_last;
-
-  } else {
-    //other_global_id = ref_rank;
-
-    MPI_Recv(&s_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
-    t_last = clock_sync->get_global_time(MPITS_get_time());
-    MPI_Send(&t_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
-    MPI_Recv(&s_now, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
-    t_now = clock_sync->get_global_time(MPITS_get_time());
-
-    td_min = s_last - t_last;
-    td_min = mpits_max(td_min, s_now - t_now);
-
-    td_max = s_now - t_last;
-  }
-  if (my_rank == ref_rank) {
-    i = 1;
-    while (1) {
-
-      MPI_Recv(&t_last, 1, MPI_DOUBLE, client_rank, pp_tag, comm, &status);
-      if (t_last < 0.0) {
-        break;
-      }
-
-      s_last = s_now;
-      s_now = clock_sync->get_global_time(MPITS_get_time());
-
-      td_min = mpits_max(td_min, t_last - s_now);
-      td_max = mpits_min(td_max, t_last - s_last);
-
-      if (ping_pong_min_time >= 0.0 && i >= Minimum_ping_pongs && s_now - s_last < ping_pong_min_time * 1.10) {
-        MPI_Send(&invalid_time, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
-        break;
-      }
-
-      i++;
-      if (i >= Number_ping_pongs) {
-        MPI_Send(&invalid_time, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
-        break;
-      }
-      MPI_Send(&s_now, 1, MPI_DOUBLE, client_rank, pp_tag, comm);
-
-    }
-  } else {
-    i = 1;
-    while (1) {
-      MPI_Send(&t_now, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
-      MPI_Recv(&s_last, 1, MPI_DOUBLE, ref_rank, pp_tag, comm, &status);
-      t_last = t_now;
-      t_now = clock_sync->get_global_time(MPITS_get_time());
-
-      if (s_last < 0.0) {
-        break;
-      }
-      td_min = mpits_max(td_min, s_last - t_now);
-      td_max = mpits_min(td_max, s_last - t_last);
-
-      if (ping_pong_min_time >= 0.0 && i >= Minimum_ping_pongs && t_now - t_last < ping_pong_min_time * 1.10) {
-        MPI_Send(&invalid_time, 1, MPI_DOUBLE, ref_rank, pp_tag, comm);
-        break;
-      }
-      i++;
-    }
-  }
-
-  if (my_rank == ref_rank) {
-    return_offset = (td_min + td_max) / 2.0;
-  } else {
-    return_offset = -(td_min + td_max) / 2.0;
-  }
-
-  return return_offset;
-}
-
-double mpits_min(double a, double b) {
-  return (a < b) ? a : b;
-}
-
-double mpits_max(double a, double b) {
-  return (a > b) ? a : b;
-}
+//double mpits_min(double a, double b) {
+//  return (a < b) ? a : b;
+//}
+//
+//double mpits_max(double a, double b) {
+//  return (a > b) ? a : b;
+//}
 
 
 void mpits_shuffle(int *array, size_t n) {
@@ -277,27 +277,27 @@ void mpits_shuffle(int *array, size_t n) {
 }
 
 
-int mpits_str_to_long(const char *str, long* result) {
-  char *endptr;
-  int error = 0;
-  long res;
-
-  errno = 0;
-  res = strtol(str, &endptr, 10);
-
-  /* Check for various possible errors */
-  if ((errno == ERANGE && (res == LONG_MAX || res == LONG_MIN)) || (errno != 0 && res == 0)) {
-    error = 1;
-  }
-  if (endptr == str) {  // no digits parsed
-    error = 1;
-  }
-  if (!error) {
-    *result = res;
-  }
-  else {
-    *result = 0;
-  }
-
-  return error;
-}
+//int mpits_str_to_long(const char *str, long* result) {
+//  char *endptr;
+//  int error = 0;
+//  long res;
+//
+//  errno = 0;
+//  res = strtol(str, &endptr, 10);
+//
+//  /* Check for various possible errors */
+//  if ((errno == ERANGE && (res == LONG_MAX || res == LONG_MIN)) || (errno != 0 && res == 0)) {
+//    error = 1;
+//  }
+//  if (endptr == str) {  // no digits parsed
+//    error = 1;
+//  }
+//  if (!error) {
+//    *result = res;
+//  }
+//  else {
+//    *result = 0;
+//  }
+//
+//  return error;
+//}
