@@ -1,8 +1,8 @@
 
-#include <string.h>
 #include <getopt.h>
-#include <assert.h>
-#include <stdlib.h>
+#include <cstring>
+#include <cstdlib>
+#include <cassert>
 
 #include "mpits.h"
 #include "mpi_clock_sync_internal.h"

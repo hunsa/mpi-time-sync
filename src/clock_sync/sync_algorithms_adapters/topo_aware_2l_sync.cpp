@@ -9,18 +9,10 @@
 #include "time_provider/clocks/Clock.hpp"
 #include "time_provider/clocks/GlobalClockOffset.hpp"
 
-#include "time_provider/clocks/Clock.hpp"
-#include "time_provider/clocks/GlobalClockOffset.hpp"
-
 #include "clock_sync/clock_sync_loader.hpp"
 #include "clock_sync/clock_sync_common.h"
-
-#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
 #include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
-#include "clock_sync/sync_algorithms/offset/SKaMPIClockSync.hpp"
-#include "clock_sync/sync_algorithms/JKClockSync.hpp"
-#include "clock_sync/sync_algorithms/HCA2ClockSync.hpp"
 #include "clock_sync/sync_algorithms/HCA3ClockSync.hpp"
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 #include "clock_sync/sync_algorithms/TwoLevelClockSync.hpp"
@@ -35,7 +27,7 @@ static GlobalClock* global_clock;
 
 
 static void topo_synchronize_clocks(void) {
-  if( global_clock != NULL ) {
+  if( global_clock != nullptr ) {
     delete global_clock;
   }
   global_clock = clock_sync->synchronize_all_clocks(MPI_COMM_WORLD, *(local_clock));
@@ -46,11 +38,11 @@ static double topo_normalized_time(double local_time) {
 }
 
 
-static void topo_cleanup_module(void) {
+static void topo_cleanup_module() {
   delete local_clock;
   delete clock_sync;
 
-  if (global_clock != NULL) {
+  if (global_clock != nullptr) {
     delete global_clock;
   }
 }
@@ -70,9 +62,9 @@ static void topo_init_module(int argc, char** argv) {
   ClockSyncLoader loader;
 
   alg1 = loader.instantiate_clock_sync("topoalg1");
-  if( alg1 != NULL ) {
+  if( alg1 != nullptr ) {
     alg2 = loader.instantiate_clock_sync("topoalg2");
-    if( alg2 != NULL ) {
+    if( alg2 != nullptr ) {
       // now instantiate new two level clock sync
       clock_sync = new TwoLevelClockSync(alg1, alg2);
     } else {
@@ -82,7 +74,7 @@ static void topo_init_module(int argc, char** argv) {
     use_default = 1;
   }
 
-  global_clock = NULL;
+  global_clock = nullptr;
   local_clock  = initialize_local_clock();
 
   if( use_default == 1 ) {

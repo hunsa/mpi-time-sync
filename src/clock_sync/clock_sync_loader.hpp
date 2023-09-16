@@ -8,7 +8,6 @@ class ClockSyncLoader {
 
 public:
   BaseClockSync* instantiate_clock_sync(const char *param_name);
-
 };
 
 

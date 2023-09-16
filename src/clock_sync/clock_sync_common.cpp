@@ -18,13 +18,13 @@
 #include "mpi_clock_sync_internal.h"
 #include "clock_sync_common.h"
 
-void default_init_synchronization(void) {}
-void default_finalize_synchronization(void) {}
+void default_init_synchronization() {}
+void default_finalize_synchronization() {}
 
 double default_get_normalized_time(double local_time, GlobalClock *global_clock) {
   double normtime = 0;
 
-  if (global_clock != NULL) {
+  if (global_clock != nullptr) {
     normtime = global_clock->convert_to_global_time(local_time);
   } else {
     std::cerr << "ERROR: No global time defined for this clock sync. method\n" << std::endl;
@@ -32,8 +32,8 @@ double default_get_normalized_time(double local_time, GlobalClock *global_clock)
   return normtime;
 }
 
-Clock *initialize_local_clock(void) {
-  Clock *local_clock = NULL;
+Clock *initialize_local_clock() {
+  Clock *local_clock = nullptr;
 #if ENABLE_GETTIME_REALTIME
   local_clock = new GettimeClock(GettimeClock::LocalClockType::LOCAL_CLOCK_REALTIME);
 #elif ENABLE_GETTIME_MONOTONIC

@@ -59,8 +59,8 @@ static ClockOffsetAlg* instantiate_clock_offset_alg(std::vector<std::string> &to
     if( tokens.size() != 3 ) {
       ZF_LOGE("number of parameters to ClockOffsetAlg wrong (!=3)\nskampi_offset@min_nb_ping_pongs@nb_ping_pongs");
     } else {
-      int min_nb_ping_pongs = atoi(tokens[1].c_str());
-      int nb_ping_pongs     = atoi(tokens[2].c_str());
+      int min_nb_ping_pongs = stoi(tokens[1]);
+      int nb_ping_pongs     = stoi(tokens[2]);
       ZF_LOGV("skampi offset with %d,%d ping-pongs", min_nb_ping_pongs, nb_ping_pongs);
       offset_alg = new SKaMPIClockOffsetAlg(min_nb_ping_pongs, nb_ping_pongs);
     }
@@ -69,8 +69,8 @@ static ClockOffsetAlg* instantiate_clock_offset_alg(std::vector<std::string> &to
     if( tokens.size() != 3 ) {
       ZF_LOGE("number of parameters to ClockOffsetAlg wrong (!=3)");
     } else {
-      int nexchanges_rtt = atoi(tokens[1].c_str());
-      int nexchanges     = atoi(tokens[2].c_str());
+      int nexchanges_rtt = stoi(tokens[1]);
+      int nexchanges     = stoi(tokens[2]);
       ZF_LOGV("ping-pong offset with %d,%d exchanges", nexchanges_rtt, nexchanges);
       offset_alg = new PingpongClockOffsetAlg(nexchanges_rtt, nexchanges);
     }
@@ -82,7 +82,7 @@ static ClockOffsetAlg* instantiate_clock_offset_alg(std::vector<std::string> &to
 }
 
 BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
-  BaseClockSync* ret_sync = NULL;
+  BaseClockSync* ret_sync = nullptr;
   char *alg_str;
   int rank;
 
@@ -110,15 +110,15 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
               // hca3@recompute_offsets@fitpoints@offsetalg_format
               if (tokens.size() >= 2) {
 
-                  bool recompute_offset = (atoi(tokens[0].c_str()) == 1);
+                  bool recompute_offset = stoi(tokens[0]) == 1;
                   tokens.erase(tokens.begin());
 
                   // get: number of fitpoints
-                  int n_fitpoints = atoi(tokens[0].c_str());
+                  int n_fitpoints = stoi(tokens[0]);
                   tokens.erase(tokens.begin());
 
                   ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
-                  if (offset_alg == NULL) {
+                  if (offset_alg == nullptr) {
                       ZF_LOGE("cannot instantiate clock offset algorithm");
                   } else {
                       if (sync_alg == "hca2") {
@@ -137,13 +137,13 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
 
               // hca@fitpoints@offsetalg_format
               //  jk@fitpoints@offsetalg_format
-              if (tokens.size() >= 1) {
+              if (!tokens.empty()) {
                   // get: number of fitpoints
-                  int n_fitpoints = atoi(tokens[0].c_str());
+                  int n_fitpoints = stoi(tokens[0]);
                   tokens.erase(tokens.begin());
 
                   ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
-                  if (offset_alg == NULL) {
+                  if (offset_alg == nullptr) {
                       ZF_LOGE("cannot instantiate clock offset algorithm");
                   } else {
                       if (sync_alg == "hca") {
@@ -159,9 +159,9 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
               }
 
           } else if (sync_alg == "skampi") {
-              if (tokens.size() >= 1) {
+              if (!tokens.empty()) {
                   ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
-                  if (offset_alg != NULL) {
+                  if (offset_alg != nullptr) {
                       ret_sync = new SKaMPIClockSync(offset_alg);
                   } else {
                       ZF_LOGE("problem with format of skampi clock offset alg");
@@ -170,9 +170,9 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
                   ZF_LOGE("format error sync alg '%s'", sync_alg.c_str());
               }
           } else if (sync_alg == "hca3offset") {
-            if (tokens.size() >= 1) {
+            if (!tokens.empty()) {
               ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
-              if (offset_alg != NULL) {
+              if (offset_alg != nullptr) {
                 ret_sync = new HCA3OffsetClockSync(offset_alg);
               } else {
                 ZF_LOGE("problem with format of hca3offset clock offset alg\nuse hca3offset@offsetalg_format");
@@ -183,8 +183,8 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
           } else if (sync_alg == "prop") {
               // topoalg2:prop@0   offset only
               // topoalg2:prop@1   linear model
-              if (tokens.size() >= 1) {
-                int prop_type = atoi(tokens[0].c_str());
+              if (!tokens.empty()) {
+                int prop_type = stoi(tokens[0]);
                 if( prop_type == 0 ) {
                   ret_sync = new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_OFFSET);
                 } else if( prop_type == 1) {
