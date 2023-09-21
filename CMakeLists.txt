@@ -61,7 +61,6 @@ set(MPITS_LIBRARY_SRC_FILES
     src/clock_sync/sync_algorithms/HCA3ClockSync.cpp
     src/clock_sync/sync_algorithms/HCAAbstractClockSync.cpp
     src/clock_sync/sync_algorithms/HCAClockSync.cpp
-    #src/clock_sync/sync_algorithms/HierarchicalClockSync.cpp
     src/clock_sync/sync_algorithms/JKClockSync.cpp
     src/clock_sync/sync_algorithms/LinearModelFitterDebug.cpp
     src/clock_sync/sync_algorithms/LinearModelFitterStandard.cpp
