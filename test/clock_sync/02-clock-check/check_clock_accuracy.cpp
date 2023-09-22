@@ -203,7 +203,7 @@ int main(int argc, char* argv[]) {
     Clock *clock = initialize_local_clock();
     SKaMPIClockOffsetAlg offset_alg(10,number_ping_pongs);
 
-    MPITS_Init(&argc, &argv, &cs, MPI_COMM_WORLD);
+    MPITS_Init(MPI_COMM_WORLD, &cs);
     print_initial_settings(argc, argv, opts, cs.print_sync_info);
 
     runtime_s = MPITS_get_time();

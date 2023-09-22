@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
 
   printf("rank %2d: %2d\n", rank, size);
 
-  MPITS_Init(&argc, &argv, &cs, MPI_COMM_WORLD);
+  MPITS_Init(MPI_COMM_WORLD, &cs);
 
   MPITS_Clocksync_init(&cs);
 

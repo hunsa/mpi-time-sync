@@ -45,7 +45,7 @@ typedef struct mpits_sync_module {
 } mpits_clocksync_t;
 
 
-int MPITS_Init(int *argc, char ***argv, mpits_clocksync_t *clocksync, MPI_Comm comm);
+int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync);
 
 int MPITS_Clocksync_init(mpits_clocksync_t *clocksync);
 

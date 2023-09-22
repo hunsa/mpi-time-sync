@@ -67,32 +67,32 @@ static int compute_argc(char *str) {
   return cnt;
 }
 
-/* https://gist.github.com/bnoordhuis/1981730 */
-char **mpits_make_argv_copy(int argc, char **argv)
-{
-  size_t strlen_sum;
-  char **argp;
-  char *data;
-  size_t len;
-  int i;
-
-  strlen_sum = 0;
-  for (i = 0; i < argc; i++) strlen_sum += strlen(argv[i]) + 1;
-
-  argp = (char**)malloc(sizeof(char *) * (argc + 1) + strlen_sum);
-  if (!argp) return NULL;
-  data = (char *) argp + sizeof(char *) * (argc + 1);
-
-  for (i = 0; i < argc; i++) {
-    argp[i] = data;
-    len = strlen(argv[i]) + 1;
-    memcpy(data, argv[i], len);
-    data += len;
-  }
-  argp[argc] = NULL;
-
-  return argp;
-}
+///* https://gist.github.com/bnoordhuis/1981730 */
+//char **mpits_make_argv_copy(int argc, char **argv)
+//{
+//  size_t strlen_sum;
+//  char **argp;
+//  char *data;
+//  size_t len;
+//  int i;
+//
+//  strlen_sum = 0;
+//  for (i = 0; i < argc; i++) strlen_sum += strlen(argv[i]) + 1;
+//
+//  argp = (char**)malloc(sizeof(char *) * (argc + 1) + strlen_sum);
+//  if (!argp) return NULL;
+//  data = (char *) argp + sizeof(char *) * (argc + 1);
+//
+//  for (i = 0; i < argc; i++) {
+//    argp[i] = data;
+//    len = strlen(argv[i]) + 1;
+//    memcpy(data, argv[i], len);
+//    data += len;
+//  }
+//  argp[argc] = NULL;
+//
+//  return argp;
+//}
 
 void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
   char *env = getenv("MPITS_PARAMS");
@@ -212,17 +212,19 @@ static int get_sync_module_index(const char* name) {
   return -1;
 }
 
-int MPITS_Init(int *argc, char ***argv, mpits_clocksync_t *clocksync, MPI_Comm comm) {
+int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync) {
 
   sync_module_info_t sync_module_info;
   int index;
+  int argc;
+  char **argv;
 
   MPITS_register_sync_modules();
 
-  mpits_check_and_override_lib_env_params(argc, argv);
-  mpits_parse_extra_key_value_options(get_global_param_store(), *argc, *argv);
+  mpits_check_and_override_lib_env_params(&argc, &argv);
+  mpits_parse_extra_key_value_options(get_global_param_store(), argc, argv);
 
-  parse_sync_options(*argc, *argv, CLOCK_SYNC_ARG, &sync_module_info);
+  parse_sync_options(argc, argv, CLOCK_SYNC_ARG, &sync_module_info);
   if (sync_module_info.name == NULL) {
     sync_module_info.name = strdup("None");
   }
@@ -235,7 +237,7 @@ int MPITS_Init(int *argc, char ***argv, mpits_clocksync_t *clocksync, MPI_Comm c
   }
 
   *clocksync = sync_modules[index];
-  clocksync->init_module(*argc, *argv);
+  clocksync->init_module(argc, argv);
 
   //cleanup_sync_options(&sync_module_info);
 
