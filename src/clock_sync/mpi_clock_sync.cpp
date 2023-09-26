@@ -113,7 +113,7 @@ void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
     //  TODO: we should probably free the old argv
     argvnew = (char**)malloc(*argc * sizeof(char**));
     // copy old argv[0]
-    argvnew[0] = *(argv[0]);
+    argvnew[0] = (char*)"dummy";
 
 //    printf("argvnew[0]=%s\n", argvnew[0]);
 
