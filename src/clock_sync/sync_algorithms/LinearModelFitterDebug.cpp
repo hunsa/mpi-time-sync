@@ -53,7 +53,7 @@ int LinearModelFitterDebug::fit_linear_model(const double *xvals, const double *
     MPI_Group_translate_ranks(my_group, 1, &my_rank, world_group, &my_rank_world);
     MPI_Group_translate_ranks(my_group, 1, &other_rank, world_group, &other_rank_world);
 
-    sprintf(abs_path, "%s/lin_model_%d_%d.res", dbg_path, my_rank_world, other_rank_world);
+    snprintf(abs_path, sizeof(abs_path), "%s/lin_model_%d_%d.res", dbg_path, my_rank_world, other_rank_world);
 
     myfile.open(abs_path);
     for(int i=0; i<nb_vals; i++) {

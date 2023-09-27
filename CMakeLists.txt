@@ -49,11 +49,10 @@ set(MPITS_LIBRARY_SRC_FILES
     src/clock_sync/mpi_clock_sync.cpp
     src/helpers/dict/mpits_dict.cpp
     src/helpers/dict/cli_param_parser.cpp
-    src/time_provider/clocks/GettimeClock.cpp
+    src/time_provider/clocks/BaseClock.cpp
     src/time_provider/clocks/GlobalClock.cpp
     src/time_provider/clocks/GlobalClockLM.cpp
     src/time_provider/clocks/GlobalClockOffset.cpp
-    src/time_provider/clocks/MPIClock.cpp
     src/clock_sync/clock_sync_common.cpp
     src/clock_sync/clock_sync_loader.cpp
     src/clock_sync/sync_algorithms/ClockPropagationSync.cpp
