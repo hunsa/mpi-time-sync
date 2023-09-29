@@ -105,6 +105,7 @@ add_executable(check_clock_accuracy
         test/clock_sync/02-clock-check/check_clock_accuracy.cpp
         test/clock_sync/02-clock-check/clock_drift_utils.c
 )
+SET_TARGET_PROPERTIES(check_clock_accuracy PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)
 
 install(TARGETS mpits
