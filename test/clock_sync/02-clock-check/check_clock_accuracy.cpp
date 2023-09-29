@@ -38,7 +38,7 @@ void print_time_parameters(FILE* f) {
   strcpy(clock, "MPI_Wtime");
 #if ENABLE_GETTIME_REALTIME
   strcpy(clock, "clock_gettime_REALTIME");
-#elif ENABLE_GETTIME_REALTIME
+#elif ENABLE_GETTIME_MONOTONIC
   strcpy(clock, "clock_gettime_MONOTONIC");
 #endif
   fprintf(f, "#@clock=%s\n", clock);
