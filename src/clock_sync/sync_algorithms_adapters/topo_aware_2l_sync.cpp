@@ -26,11 +26,11 @@ static Clock* local_clock;
 static GlobalClock* global_clock;
 
 
-static void topo_synchronize_clocks(void) {
+static void topo_synchronize_clocks(MPI_Comm comm) {
   if( global_clock != nullptr ) {
     delete global_clock;
   }
-  global_clock = clock_sync->synchronize_all_clocks(MPI_COMM_WORLD, *(local_clock));
+  global_clock = clock_sync->synchronize_all_clocks(comm, *(local_clock));
 }
 
 static double topo_normalized_time(double local_time) {
@@ -55,15 +55,15 @@ static void topo_print_sync_parameters(FILE* f)
 }
 
 
-static void topo_init_module(int argc, char** argv) {
+static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
   int use_default = 0;
   BaseClockSync *alg1;
   BaseClockSync *alg2;
   ClockSyncLoader loader;
 
-  alg1 = loader.instantiate_clock_sync("topoalg1");
+  alg1 = loader.instantiate_clock_sync(comm, "topoalg1");
   if( alg1 != nullptr ) {
-    alg2 = loader.instantiate_clock_sync("topoalg2");
+    alg2 = loader.instantiate_clock_sync(comm, "topoalg2");
     if( alg2 != nullptr ) {
       // now instantiate new two level clock sync
       clock_sync = new TwoLevelClockSync(alg1, alg2);
@@ -79,7 +79,7 @@ static void topo_init_module(int argc, char** argv) {
 
   if( use_default == 1 ) {
     int rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    MPI_Comm_rank(comm, &rank);
     if( rank == 0 ) {
       ZF_LOGW("!!! using default topo1 clock sync options");
     }

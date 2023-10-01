@@ -24,11 +24,11 @@ static ClockSync* clock_sync;
 static Clock* local_clock;
 static GlobalClock* global_clock;
 
-static void synchronize_clocks(void) {
+static void synchronize_clocks(MPI_Comm comm) {
     if( global_clock != NULL ) {
         delete global_clock;
     }
-    global_clock = clock_sync->synchronize_all_clocks(MPI_COMM_WORLD, *(local_clock));
+    global_clock = clock_sync->synchronize_all_clocks(comm, *(local_clock));
 }
 
 static double get_normalized_time(double local_time) {
@@ -64,13 +64,13 @@ static void hca_print_sync_parameters(FILE* f)
 }
 
 
-static void hca_init_module(int argc, char** argv) {
+static void hca_init_module(MPI_Comm comm, int argc, char** argv) {
   ClockSyncLoader loader;
 
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync("alg");
+  clock_sync = loader.instantiate_clock_sync(comm, "alg");
   if( clock_sync != NULL ) {
     // now we make sure it's really an HCA instance
     if( dynamic_cast<HCAClockSync*>(clock_sync) == NULL ) {
@@ -98,13 +98,13 @@ static void hca2_print_sync_parameters(FILE* f)
 }
 
 
-static void hca2_init_module(int argc, char** argv) {
+static void hca2_init_module(MPI_Comm comm, int argc, char** argv) {
   ClockSyncLoader loader;
 
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync("alg");
+  clock_sync = loader.instantiate_clock_sync(comm, "alg");
   if( clock_sync != NULL ) {
     // now we make sure it's really an HCA2 instance
     if( dynamic_cast<HCA2ClockSync*>(clock_sync) == NULL ) {
@@ -124,13 +124,13 @@ static void hca2_init_module(int argc, char** argv) {
  *
  */
 
-static void hca3_init_module(int argc, char** argv) {
+static void hca3_init_module(MPI_Comm comm, int argc, char** argv) {
   ClockSyncLoader loader;
 
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync("alg");
+  clock_sync = loader.instantiate_clock_sync(comm, "alg");
   if( clock_sync != NULL ) {
     // now we make sure it's really an HCA3 instance
     if( dynamic_cast<HCA3ClockSync*>(clock_sync) == NULL ) {
@@ -156,13 +156,13 @@ static void hca3_print_sync_parameters(FILE* f)
  *
  */
 
-static void hca3_offset_init_module(int argc, char** argv) {
+static void hca3_offset_init_module(MPI_Comm comm, int argc, char** argv) {
     ClockSyncLoader loader;
 
     global_clock = NULL;
     local_clock = initialize_local_clock();
 
-    clock_sync = loader.instantiate_clock_sync("alg");
+    clock_sync = loader.instantiate_clock_sync(comm, "alg");
     if( clock_sync != NULL ) {
         // now we make sure it's really an HCA3Offset instance
         if( dynamic_cast<HCA3OffsetClockSync*>(clock_sync) == NULL ) {

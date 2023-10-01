@@ -36,8 +36,8 @@ static Clock* local_clock;
 static GlobalClock* global_clock;
 
 
-static void topo_synchronize_clocks(void) {
-  global_clock = clock_sync->synchronize_all_clocks(MPI_COMM_WORLD, *(local_clock));
+static void topo_synchronize_clocks(MPI_Comm comm) {
+  global_clock = clock_sync->synchronize_all_clocks(comm, *(local_clock));
 }
 
 static double topo_normalized_time(double local_time) {
@@ -62,7 +62,7 @@ static void topo_print_sync_parameters(FILE* f)
 }
 
 
-static void topo_init_module(int argc, char** argv) {
+static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
   int use_default = 0;
   BaseClockSync *alg1;
   BaseClockSync *alg2;
@@ -70,12 +70,12 @@ static void topo_init_module(int argc, char** argv) {
   ClockSyncLoader loader;
 
 
-  alg1 = loader.instantiate_clock_sync("topoalg1");
-  if( alg1 != NULL ) {
-    alg2 = loader.instantiate_clock_sync("topoalg2");
-    if( alg2 != NULL ) {
-      alg3 = loader.instantiate_clock_sync("topoalg3");
-      if( alg3 != NULL ) {
+  alg1 = loader.instantiate_clock_sync(comm, "topoalg1");
+  if( alg1 != nullptr ) {
+    alg2 = loader.instantiate_clock_sync(comm, "topoalg2");
+    if( alg2 != nullptr ) {
+      alg3 = loader.instantiate_clock_sync(comm, "topoalg3");
+      if( alg3 != nullptr ) {
         // now instantiate new hierarchical clock sync
         clock_sync = new HierarchicalClockSync(alg1, alg2, alg3);
       } else {
@@ -89,7 +89,7 @@ static void topo_init_module(int argc, char** argv) {
   }
 
 
-  global_clock = NULL;
+  global_clock = nullptr;
   local_clock  = initialize_local_clock();
 
   if( use_default == 1 ) {

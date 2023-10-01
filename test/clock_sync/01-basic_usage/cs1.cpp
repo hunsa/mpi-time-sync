@@ -17,11 +17,12 @@ int main(int argc, char *argv[]) {
 
   MPITS_Init(MPI_COMM_WORLD, &cs);
 
-  MPITS_Clocksync_init(&cs);
 
+  MPITS_Clocksync_init(&cs);
   for(int i=0; i<5; i++) {
     MPITS_Clocksync_sync(&cs);
   }
+  MPITS_Clocksync_finalize(&cs);
 
   MPITS_Finalize();
 

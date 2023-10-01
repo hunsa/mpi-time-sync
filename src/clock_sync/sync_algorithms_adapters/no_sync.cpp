@@ -5,10 +5,13 @@
 #include "no_sync.h"
 #include "clock_sync/mpi_clock_sync_internal.h"
 
-static void empty(void) {
+static void empty() {
 };
 
-static void empty_init_module(int argc, char** argv) {
+static void empty_with_comm(MPI_Comm comm) {
+};
+
+static void empty_init_module(MPI_Comm comm, int argc, char** argv) {
 }
 
 static double get_normalized_time(double local_time) {
@@ -36,10 +39,10 @@ void register_no_clock_sync_module(mpits_clocksync_t *sync_mod) {
   sync_mod->init_module = empty_init_module;
   sync_mod->cleanup_module = empty;
 
-  sync_mod->init_sync = empty;
-  sync_mod->finalize_sync = empty;
+  sync_mod->init_sync = empty_with_comm;
+  sync_mod->finalize_sync = empty_with_comm;
 
-  sync_mod->sync_clocks = empty;
+  sync_mod->sync_clocks = empty_with_comm;
 
   sync_mod->get_global_time = get_normalized_time;
   sync_mod->print_sync_info = print_sync_parameters;

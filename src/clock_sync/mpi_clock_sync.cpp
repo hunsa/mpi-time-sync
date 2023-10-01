@@ -67,33 +67,6 @@ static int compute_argc(char *str) {
   return cnt;
 }
 
-///* https://gist.github.com/bnoordhuis/1981730 */
-//char **mpits_make_argv_copy(int argc, char **argv)
-//{
-//  size_t strlen_sum;
-//  char **argp;
-//  char *data;
-//  size_t len;
-//  int i;
-//
-//  strlen_sum = 0;
-//  for (i = 0; i < argc; i++) strlen_sum += strlen(argv[i]) + 1;
-//
-//  argp = (char**)malloc(sizeof(char *) * (argc + 1) + strlen_sum);
-//  if (!argp) return NULL;
-//  data = (char *) argp + sizeof(char *) * (argc + 1);
-//
-//  for (i = 0; i < argc; i++) {
-//    argp[i] = data;
-//    len = strlen(argv[i]) + 1;
-//    memcpy(data, argv[i], len);
-//    data += len;
-//  }
-//  argp[argc] = NULL;
-//
-//  return argp;
-//}
-
 void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
   char *env = getenv("MPITS_PARAMS");
   char **argvnew;
@@ -234,10 +207,12 @@ int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync) {
     char err_msg[160];
     snprintf(err_msg, sizeof(err_msg), "Unknown synchronization module \"--clock-sync=%s\"", sync_module_info.name);
     fprintf(stderr, "%s\n", err_msg);
+    return -1;
   }
 
   *clocksync = sync_modules[index];
-  clocksync->init_module(argc, argv);
+  clocksync->init_module(comm, argc, argv);
+  clocksync->comm = comm;
 
   //cleanup_sync_options(&sync_module_info);
 
@@ -245,11 +220,12 @@ int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync) {
 }
 
 int MPITS_Clocksync_init(mpits_clocksync_t *clocksync) {
+  clocksync->init_sync(clocksync->comm);
   return 0;
 }
 
 int MPITS_Clocksync_sync(mpits_clocksync_t *clocksync) {
-  clocksync->sync_clocks();
+  clocksync->sync_clocks(clocksync->comm);
   return 0;
 }
 
@@ -258,7 +234,7 @@ int MPITS_Clocksync_resync(mpits_clocksync_t *clocksync) {
 }
 
 int MPITS_Clocksync_finalize(mpits_clocksync_t *clocksync) {
-  MPITS_deregister_sync_modules();
+  clocksync->finalize_sync(clocksync->comm);
   return 0;
 }
 
@@ -267,6 +243,7 @@ double MPITS_Clocksync_get_time(mpits_clocksync_t *clocksync) {
 }
 
 int MPITS_Finalize() {
+  MPITS_deregister_sync_modules();
   return 0;
 }
 

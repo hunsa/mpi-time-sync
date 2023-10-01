@@ -5,9 +5,9 @@
 #include "time_provider/clocks/GlobalClock.hpp"
 
 
-void default_init_synchronization();
+void default_init_synchronization(MPI_Comm comm);
 
-void default_finalize_synchronization();
+void default_finalize_synchronization(MPI_Comm comm);
 
 double default_get_normalized_time(double local_time, GlobalClock *global_clock);
 

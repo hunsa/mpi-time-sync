@@ -26,15 +26,15 @@ typedef enum {
 } mpits_clocksync_alg_t;
 
 typedef struct mpits_sync_module {
-  void (*init_module)(int argc, char **argv);
+  void (*init_module)(MPI_Comm, int argc, char **argv);
 
   void (*cleanup_module)(void);
 
-  void (*init_sync)(void);
+  void (*init_sync)(MPI_Comm);
 
-  void (*finalize_sync)(void);
+  void (*finalize_sync)(MPI_Comm);
 
-  void (*sync_clocks)(void);
+  void (*sync_clocks)(MPI_Comm);
 
   sync_normtime_t get_global_time;
   print_sync_info_t print_sync_info;
@@ -42,6 +42,8 @@ typedef struct mpits_sync_module {
   char *name;
   // a module is uniquely identified by the clock sync. method and the process synchronization method
   mpits_clocksync_alg_t clocksync;
+
+  MPI_Comm comm;
 } mpits_clocksync_t;
 
 

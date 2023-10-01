@@ -89,9 +89,9 @@ static void parse_keyvalue_list(char* args, mpits_map dict) {
 
 void mpits_parse_extra_key_value_options(mpits_map dict, int argc, char **argv) {
   int c;
-  int nprocs, my_rank;
-  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
-  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+//  int nprocs, my_rank;
+//  MPI_Comm_size(MPI_COMM_WORLD, &nprocs);
+//  MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
 
   optind = 1;	// reset optind to enable option re-parsing, especially if we are not the first ones
   opterr = 0;

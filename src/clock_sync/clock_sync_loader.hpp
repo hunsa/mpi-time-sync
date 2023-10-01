@@ -7,7 +7,7 @@
 class ClockSyncLoader {
 
 public:
-  BaseClockSync* instantiate_clock_sync(const char *param_name);
+  BaseClockSync* instantiate_clock_sync(MPI_Comm comm, const char *param_name);
 };
 
 

@@ -195,7 +195,7 @@ GlobalClock* HCAClockSync::synchronize_all_clocks(MPI_Comm comm, Clock& c) {
     lm.intercept = 0;
   }
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &master_rank);
+  MPI_Comm_rank(comm, &master_rank);
   MPI_Type_free(&mpi_lm_t);
   //printf("[rank %d] rank=%d s=%f i=%f nprocs=%d\n",master_rank, my_rank, lm.slope, lm.intercept,nprocs );
   return new GlobalClockLM(c, lm.slope, lm.intercept);

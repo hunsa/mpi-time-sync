@@ -50,21 +50,21 @@ static void sk_print_sync_parameters(FILE* f) {
     fprintf(f, "#@clocksync=SKaMPI\n");
 }
 
-static void synchronize_clocks(void) {
-  global_clock = clock_sync->synchronize_all_clocks(MPI_COMM_WORLD, *(local_clock));
+static void synchronize_clocks(MPI_Comm comm) {
+  global_clock = clock_sync->synchronize_all_clocks(comm, *(local_clock));
 }
 
 static double get_normalized_time(double local_time) {
   return default_get_normalized_time(local_time, global_clock);
 }
 
-void sk_init_module(int argc, char** argv) {
+void sk_init_module(MPI_Comm comm, int argc, char** argv) {
   ClockSyncLoader loader;
 
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync("alg");
+  clock_sync = loader.instantiate_clock_sync(comm, "alg");
   if( clock_sync != NULL ) {
     // now we make sure it's really a SKaMPI clock sync instance
     if( dynamic_cast<SKaMPIClockSync*>(clock_sync) == NULL ) {

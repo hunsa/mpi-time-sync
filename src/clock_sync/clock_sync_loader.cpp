@@ -81,12 +81,12 @@ static ClockOffsetAlg* instantiate_clock_offset_alg(std::vector<std::string> &to
   return offset_alg;
 }
 
-BaseClockSync* ClockSyncLoader::instantiate_clock_sync(const char *param_name) {
+BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char *param_name) {
   BaseClockSync* ret_sync = nullptr;
   char *alg_str;
   int rank;
 
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+  MPI_Comm_rank(comm, &rank);
 
   ZF_LOGV("instantiate clock for '%s'", param_name);
 

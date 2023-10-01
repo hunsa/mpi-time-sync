@@ -11,8 +11,8 @@
 #include "mpi_clock_sync_internal.h"
 #include "clock_sync_common.h"
 
-void default_init_synchronization() {}
-void default_finalize_synchronization() {}
+void default_init_synchronization(MPI_Comm comm) {}
+void default_finalize_synchronization(MPI_Comm comm) {}
 
 double default_get_normalized_time(double local_time, GlobalClock *global_clock) {
   double normtime = 0;
