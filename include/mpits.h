@@ -47,20 +47,81 @@ typedef struct mpits_sync_module {
 } mpits_clocksync_t;
 
 
+/**
+ * Initialize the time synchronization library.
+ *
+ * It must be called after MPI_Init.
+ *
+ * @param comm
+ * @param clocksync
+ * @return
+ */
 int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync);
+
+/**
+ * Finalize call to time synchronization library.
+ *
+ * Must be called before MPI_Finalize.
+ *
+ * @return
+ */
+int MPITS_Finalize();
+
+
+/**
+ * Initialize a clock synchronization algorithm.
+ * @param clocksync
+ * @return
+ */
 
 int MPITS_Clocksync_init(mpits_clocksync_t *clocksync);
 
+/**
+ * Perform a clock synchronization.
+ * @param clocksync
+ * @return
+ */
+
 int MPITS_Clocksync_sync(mpits_clocksync_t *clocksync);
+
+/**
+ * Perform a resynchronizatin of the clock.
+ *
+ * Must be called after one call to MPITS_Clocksync_sync.
+ *
+ * @param clocksync
+ * @return
+ */
 
 int MPITS_Clocksync_resync(mpits_clocksync_t *clocksync);
 
+/**
+ * Finalize a clock synchronization algorithm.
+ * @param clocksync
+ * @return
+ */
+
 int MPITS_Clocksync_finalize(mpits_clocksync_t *clocksync);
 
+
+/**
+ * This function returns the current global time of a process.
+ *
+ * Internally, it will call MPITS_get_time() and convert the local timestamp
+ * into a global timestamp depending on the clock synchronization method selected.
+ *
+ * @param clocksync
+ * @return global time stamp
+ */
 double MPITS_Clocksync_get_time(mpits_clocksync_t *clocksync);
 
-int MPITS_Finalize();
 
+/**
+ * This is a time wrapper for the actual time on each process.
+ * It abstracts from time sources such as MPI_Wtime or clock_gettime.
+ *
+ * @return current time
+ */
 double MPITS_get_time(void);
 
 #ifdef __cplusplus
