@@ -1,0 +1,19 @@
+# Required for check_language
+include(CheckLanguage)
+
+@PACKAGE_INIT@
+
+set_and_check(MPITS_DIR "${PACKAGE_PREFIX_DIR}")
+set_and_check(MPITS_INCLUDE_DIRS "@PACKAGE_MPITS_INSTALL_INCLUDEDIR@")
+set_and_check(MPITS_CMAKE_DIRS "@PACKAGE_MPITS_INSTALL_CMAKEDIR@")
+set_and_check(MPITS_LIBRARY_DIRS "@PACKAGE_MPITS_INSTALL_LIBDIR@")
+set_and_check(MPITS_BINARY_DIRS "@PACKAGE_MPITS_INSTALL_BINDIR@")
+
+# Pull the dependencies
+list(APPEND CMAKE_PREFIX_PATH "${MPITS_CMAKE_DIRS}")
+list(APPEND CMAKE_MODULE_PATH "${MPITS_CMAKE_DIRS}")
+
+# Pull the MPITS::<targets>
+if(NOT TARGET MPITS::mpits)
+    include(${CMAKE_CURRENT_LIST_DIR}/MPITSTargets.cmake)
+endif(NOT TARGET MPITS::mpits)
