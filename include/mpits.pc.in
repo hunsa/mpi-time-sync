@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}/@CMAKE_INSTALL_BINDIR@
+libdir=${prefix}/@CMAKE_INSTALL_LIBDIR@
+includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@
+
+Name: MPITS
+Description: Library for time synchronization across MPI processes
+Version: @PROJECT_VERSION@
+Requires: @MPITS_REQUIRES@
+Libs: -L${libdir} -lmpits @EXTRA_LIBS_EXPANDED@ @EXTRA_LDFLAGS@
+Cflags: -I${includedir} @EXTRA_INCLUDES_EXPANDED@ @EXTRA_CFLAGS@

@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.24)
 
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
 project(mpi_time_sync)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -8,17 +11,36 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(MPI REQUIRED)
 
-include_directories(include src)
-include_directories(${MPI_INCLUDE_PATH})
+# Configure the installation paths
+set(MPITS_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
+set(MPITS_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
+set(MPITS_INSTALL_BINDIR ${CMAKE_INSTALL_BINDIR})
+set(MPITS_INSTALL_LIBEXECDIR ${CMAKE_INSTALL_LIBEXECDIR})
+set(MPITS_INSTALL_DATADIR ${CMAKE_INSTALL_DATADIR})
+set(MPITS_INSTALL_CMAKEDIR ${CMAKE_INSTALL_DATADIR}/cmake/mpits)
 
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
+
+STRING(COMPARE EQUAL ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR} MPITS_BUILD_INPLACE)
+if(NOT MPITS_BUILD_INPLACE)
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}")
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/include")
+  include_directories(BEFORE "${CMAKE_CURRENT_SOURCE_DIR}/src")
+endif(NOT MPITS_BUILD_INPLACE)
+include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
+include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/include")
+include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/src")
+
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 SET(MY_COMPILE_FLAGS "")
 SET(MY_ADDITIONAL_LIBS "")
+
+set(MPITS_REQUIRES "")
 
 find_package(GSL REQUIRED)
 if (GSL_INCLUDE_DIR)
     message (STATUS "GSL INCLUDES: ${GSL_INCLUDE_DIR}")
     include_directories(${GSL_INCLUDE_DIR})
+    set(MPITS_REQUIRES "${MPITS_REQUIRES} gsl")
 else(GSL_INCLUDE_DIR)
     message (FATAL_ERROR "GSL libraries not found.")
 endif(GSL_INCLUDE_DIR)
@@ -28,6 +50,7 @@ if (HWLOC_FOUND)
     message (STATUS "HWLOC INCLUDES: ${HWLOC_INCLUDE_DIR}")
     SET(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS} -DHAVE_HWLOC")
     SET(MY_ADDITIONAL_LIBS ${HWLOC_LIBRARY} ${MY_ADDITIONAL_LIBS})
+    set(MPITS_REQUIRES "${MPITS_REQUIRES} hwloc")
 else(HWLOC_FOUND)
     message (STATUS "The HWLOC library was not found. Compiling without HWLOC support.")
 endif(HWLOC_FOUND)
@@ -92,9 +115,21 @@ if (HWLOC_FOUND)
 endif (HWLOC_FOUND)
 
 add_library(mpits SHARED  ${MPITS_LIBRARY_SRC_FILES})
+add_library(MPITS::mpits ALIAS mpits)
+set_target_properties(mpits PROPERTIES PUBLIC_HEADER include/mpits.h)
+
+# make sure the include directory is part of the interface
+target_include_directories(mpits
+        INTERFACE
+        $<INSTALL_INTERFACE:${MPITS_INSTALL_INCLUDEDIR}>
+        $<$<NOT:${MPITS_BUILD_INPLACE}>:
+          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+          $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}/include>>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>)
 
 SET_TARGET_PROPERTIES(mpits PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries(mpits PUBLIC ${MPI_LIBRARIES} ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
+target_link_libraries(mpits PUBLIC ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
 
 add_executable(cs1
     test/clock_sync/01-basic_usage/cs1.cpp
@@ -108,11 +143,33 @@ add_executable(check_clock_accuracy
 SET_TARGET_PROPERTIES(check_clock_accuracy PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)
 
-install(TARGETS mpits
-        LIBRARY DESTINATION lib
-        ARCHIVE DESTINATION lib
-        RUNTIME DESTINATION bin)
 
-install(FILES
-        include/mpits.h
-        DESTINATION include)
+configure_package_config_file(cmake_modules/mpits-config.cmake.in
+        ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake
+        INSTALL_DESTINATION ${MPITS_INSTALL_CMAKEDIR}
+        PATH_VARS   MPITS_INSTALL_LIBDIR
+                    MPITS_INSTALL_INCLUDEDIR
+                    MPITS_INSTALL_BINDIR
+                    MPITS_INSTALL_LIBEXECDIR
+                    MPITS_INSTALL_CMAKEDIR)
+
+install(TARGETS mpits
+        EXPORT mpits-targets
+        LIBRARY DESTINATION ${MPITS_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${MPITS_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${MPITS_INSTALL_BINDIR}
+		PUBLIC_HEADER DESTINATION ${MPITS_INSTALL_INCLUDEDIR})
+
+install(FILES ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake
+        DESTINATION ${MPITS_INSTALL_CMAKEDIR})
+
+install(EXPORT mpits-targets # rules to export the targets built here
+        FILE MPITSTargets.cmake
+        NAMESPACE MPITS::
+        DESTINATION ${MPITS_INSTALL_CMAKEDIR})
+
+
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/include/mpits.pc.in ${CMAKE_CURRENT_BINARY_DIR}/mpits.pc @ONLY)
+
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/mpits.pc
+    DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/pkgconfig)
