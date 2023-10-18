@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
 
 project(mpi_time_sync)
 
