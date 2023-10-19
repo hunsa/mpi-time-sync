@@ -72,7 +72,7 @@ void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
   char **argvnew;
 
   if( env == NULL ) {
-    env = strdup("--clock-sync=HCA3O --params=alg:hca3offset@skampi_offset@5@20");
+    env = strdup("--clock-sync=HCA3O --params=alg:HCA3O@skampi_offset@5@20");
   }
 
   if( env != NULL ) {

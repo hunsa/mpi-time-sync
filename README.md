@@ -41,6 +41,12 @@ The following clock synchronization algorithms are available:
 - NONE, no clock synchronization
     - used for passing time through (for time synchronized systems, e.g., PTP, BlueGen/Q, etc.)
 
+
+```
+export MPITS_PARAMS="--clock-sync=HCA3O --params=alg:HCA3O@skampi_offset@5@20"
+```
+
+
 ## Support for hwloc
 
 ```

@@ -112,7 +112,7 @@ static void hca2_init_module(MPI_Comm comm, int argc, char** argv) {
       exit(1);
     }
   } else {
-    ZF_LOGV("using default hca2 clock sync");
+    ZF_LOGV("using default HCA2 clock sync");
     clock_sync = new HCA2ClockSync(new PingpongClockOffsetAlg(100,100), 1000, false);
   }
 }
@@ -170,7 +170,7 @@ static void hca3_offset_init_module(MPI_Comm comm, int argc, char** argv) {
             exit(1);
         }
     } else {
-        ZF_LOGV("using default hca3offset clock sync");
+        ZF_LOGV("using default HCA3O clock sync");
         clock_sync = new HCA3OffsetClockSync(new SKaMPIClockOffsetAlg(5,20));
     }
 

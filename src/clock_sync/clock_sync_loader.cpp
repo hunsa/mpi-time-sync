@@ -104,7 +104,7 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
 
           tokens.erase(tokens.begin());
 
-          if (sync_alg == "hca2" || sync_alg == "hca3") {
+          if (sync_alg == "HCA2" || sync_alg == "HCA3") {
 
               // hca2@recompute_offsets@fitpoints@offsetalg_format
               // hca3@recompute_offsets@fitpoints@offsetalg_format
@@ -121,11 +121,11 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
                   if (offset_alg == nullptr) {
                       ZF_LOGE("cannot instantiate clock offset algorithm");
                   } else {
-                      if (sync_alg == "hca2") {
-                          ZF_LOGV("hca2 clock sync with %d fitpoints, recompute %d", n_fitpoints, recompute_offset);
+                      if (sync_alg == "HCA2") {
+                          ZF_LOGV("HCA2 clock sync with %d fitpoints, recompute %d", n_fitpoints, recompute_offset);
                           ret_sync = new HCA2ClockSync(offset_alg, n_fitpoints, recompute_offset);
-                      } else if (sync_alg == "hca3") {
-                          ZF_LOGV("hca3 clock sync with %d fitpoints, recompute %d", n_fitpoints, recompute_offset);
+                      } else if (sync_alg == "HCA3") {
+                          ZF_LOGV("HCA3 clock sync with %d fitpoints, recompute %d", n_fitpoints, recompute_offset);
                           ret_sync = new HCA3ClockSync(offset_alg, n_fitpoints, recompute_offset);
                       }
                   }
@@ -133,7 +133,7 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
                   ZF_LOGE("format error sync alg '%s'", sync_alg.c_str());
               }
 
-          } else if (sync_alg == "hca" || sync_alg == "jk") {
+          } else if (sync_alg == "HCA" || sync_alg == "JK") {
 
               // hca@fitpoints@offsetalg_format
               //  jk@fitpoints@offsetalg_format
@@ -146,11 +146,11 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
                   if (offset_alg == nullptr) {
                       ZF_LOGE("cannot instantiate clock offset algorithm");
                   } else {
-                      if (sync_alg == "hca") {
-                          ZF_LOGV("hca clock sync with %d fitpoints", n_fitpoints);
+                      if (sync_alg == "HCA") {
+                          ZF_LOGV("HCA clock sync with %d fitpoints", n_fitpoints);
                           ret_sync = new HCAClockSync(offset_alg, n_fitpoints);
-                      } else if (sync_alg == "jk") {
-                          ZF_LOGV("jk clock sync with %d fitpoints", n_fitpoints);
+                      } else if (sync_alg == "JK") {
+                          ZF_LOGV("JK clock sync with %d fitpoints", n_fitpoints);
                           ret_sync = new JKClockSync(offset_alg, n_fitpoints);
                       }
                   }
@@ -158,27 +158,27 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
                   ZF_LOGE("format error sync alg '%s'", sync_alg.c_str());
               }
 
-          } else if (sync_alg == "skampi") {
+          } else if (sync_alg == "SKaMPI") {
               if (!tokens.empty()) {
                   ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
                   if (offset_alg != nullptr) {
                       ret_sync = new SKaMPIClockSync(offset_alg);
                   } else {
-                      ZF_LOGE("problem with format of skampi clock offset alg");
+                      ZF_LOGE("problem with format of SKaMPI clock offset alg");
                   }
               } else {
                   ZF_LOGE("format error sync alg '%s'", sync_alg.c_str());
               }
-          } else if (sync_alg == "hca3offset") {
+          } else if (sync_alg == "HCA3O") {
             if (!tokens.empty()) {
               ClockOffsetAlg *offset_alg = instantiate_clock_offset_alg(tokens);
               if (offset_alg != nullptr) {
                 ret_sync = new HCA3OffsetClockSync(offset_alg);
               } else {
-                ZF_LOGE("problem with format of hca3offset clock offset alg\nuse hca3offset@offsetalg_format");
+                ZF_LOGE("problem with format of HCA3O clock offset alg\nuse HCA3O@offsetalg_format");
               }
             } else {
-              ZF_LOGE("problem with format of hca3offset clock offset alg: sync alg '%s'\nuse hca3offset@offsetalg_format", sync_alg.c_str());
+              ZF_LOGE("problem with format of HCA3O clock offset alg: sync alg '%s'\nuse HCA3O@offsetalg_format", sync_alg.c_str());
             }
           } else if (sync_alg == "prop") {
               // topoalg2:prop@0   offset only
