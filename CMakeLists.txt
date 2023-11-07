@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.24)
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
-project(mpi_time_sync)
+project(mpi_time_sync VERSION 1.0 LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
