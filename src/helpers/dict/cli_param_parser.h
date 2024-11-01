@@ -13,7 +13,7 @@ extern "C" {
 
 void mpits_parse_extra_key_value_options(mpits_map dict, int argc, char **argv);
 
-mpits_map get_global_param_store();
+mpits_map mpits_get_global_param_store();
 
 #ifdef __cplusplus
 }

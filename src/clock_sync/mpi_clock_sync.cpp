@@ -195,7 +195,7 @@ int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync) {
   MPITS_register_sync_modules();
 
   mpits_check_and_override_lib_env_params(&argc, &argv);
-  mpits_parse_extra_key_value_options(get_global_param_store(), argc, argv);
+  mpits_parse_extra_key_value_options(mpits_get_global_param_store(), argc, argv);
 
   parse_sync_options(argc, argv, CLOCK_SYNC_ARG, &sync_module_info);
   if (sync_module_info.name == NULL) {

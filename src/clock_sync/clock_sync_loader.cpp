@@ -92,8 +92,8 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
 
   //mpits_print_dictionary(get_global_param_store(), stdout);
 
-  if (mpits_dict_has_key(get_global_param_store(), param_name) == 1) {
-      mpits_get_value_from_dict(get_global_param_store(), param_name, &alg_str);
+  if (mpits_dict_has_key(mpits_get_global_param_store(), param_name) == 1) {
+      mpits_get_value_from_dict(mpits_get_global_param_store(), param_name, &alg_str);
 
       std::vector<std::string> tokens = str_split(alg_str, '@');
 
