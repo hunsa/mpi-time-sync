@@ -70,7 +70,9 @@ static void parse_keyvalue_list(char* args, mpits_map dict) {
           }
         }
         else {
-          exit_after_keyvalue_error("Parameter already exists");
+          char buf[80];
+          snprintf(buf, sizeof(buf), "Parameter already exists: %s", key);
+          exit_after_keyvalue_error(buf);
         }
       }
       else {
