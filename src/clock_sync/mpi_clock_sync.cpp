@@ -90,7 +90,8 @@ void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
 
 //    printf("argvnew[0]=%s\n", argvnew[0]);
 
-    token = strtok(env, " ");
+    char *env_copy = strdup(env);
+    token = strtok(env_copy, " ");
     if( token != NULL ) {
 //      printf("token: %s\n", token);
       argvnew[1] = token;
