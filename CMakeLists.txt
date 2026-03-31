@@ -11,6 +11,8 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(MPI REQUIRED)
 
+option(BUILD_EXAMPLES "Build mpits examples" OFF)
+
 # Configure the installation paths
 set(MPITS_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
 set(MPITS_INSTALL_LIBDIR ${CMAKE_INSTALL_LIBDIR})
@@ -130,6 +132,8 @@ target_include_directories(mpits
 SET_TARGET_PROPERTIES(mpits PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 target_link_libraries(mpits PUBLIC ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
 
+
+if(BUILD_EXAMPLES)
 add_executable(cs1
     test/clock_sync/01-basic_usage/cs1.cpp
 )
@@ -141,7 +145,7 @@ add_executable(check_clock_accuracy
 )
 SET_TARGET_PROPERTIES(check_clock_accuracy PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)
-
+endif ()
 
 configure_package_config_file(cmake_modules/mpits-config.cmake.in
         ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake
