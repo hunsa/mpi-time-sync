@@ -184,7 +184,7 @@ static void hca3_offset_print_sync_parameters(FILE* f)
 
 extern "C"
 void register_hca_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("HCA").c_str();
+  //sync_mod->name = (char*)std::string("HCA").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_HCA;
   sync_mod->init_module = hca_init_module;
   sync_mod->cleanup_module = hca_cleanup_module;
@@ -199,7 +199,7 @@ void register_hca_module(mpits_clocksync_t *sync_mod) {
 
 extern "C"
 void register_hca2_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("HCA2").c_str();
+  //sync_mod->name = (char*)std::string("HCA2").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_HCA2;
   sync_mod->init_module = hca2_init_module;
   sync_mod->cleanup_module = hca_cleanup_module;
@@ -215,7 +215,7 @@ void register_hca2_module(mpits_clocksync_t *sync_mod) {
 
 extern "C"
 void register_hca3_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("HCA3").c_str();
+  //sync_mod->name = (char*)std::string("HCA3").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_HCA3;
   sync_mod->init_module = hca3_init_module;
   sync_mod->cleanup_module = hca_cleanup_module;
@@ -231,7 +231,7 @@ void register_hca3_module(mpits_clocksync_t *sync_mod) {
 
 extern "C"
 void register_hca3_offset_module(mpits_clocksync_t *sync_mod) {
-    sync_mod->name = (char*)std::string("HCA3O").c_str();
+    //sync_mod->name = (char*)std::string("HCA3O").c_str();
     sync_mod->clocksync = MPITS_CLOCKSYNC_HCA3_OFFSET;
     sync_mod->init_module = hca3_offset_init_module;
     sync_mod->cleanup_module = hca_cleanup_module;

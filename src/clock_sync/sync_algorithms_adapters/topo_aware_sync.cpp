@@ -110,7 +110,7 @@ static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
 
 extern "C"
 void register_topo_aware_sync1_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("Topo1").c_str();
+  ///sync_mod->name = (char*)std::string("Topo1").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_TOPO1;
   sync_mod->init_module = topo_init_module;
   sync_mod->cleanup_module = topo_cleanup_module;

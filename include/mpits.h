@@ -39,7 +39,7 @@ typedef struct mpits_sync_module {
   sync_normtime_t get_global_time;
   print_sync_info_t print_sync_info;
 
-  char *name;
+  //char *name;
   // a module is uniquely identified by the clock sync. method and the process synchronization method
   mpits_clocksync_alg_t clocksync;
 

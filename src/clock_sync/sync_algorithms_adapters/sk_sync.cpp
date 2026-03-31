@@ -89,7 +89,7 @@ void sk_cleanup_module(void) {
 
 extern "C"
 void register_skampi_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*) std::string("SKaMPI").c_str();
+  //sync_mod->name = (char*) std::string("SKaMPI").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_SKAMPI;
 
   sync_mod->init_module = sk_init_module;

@@ -33,7 +33,7 @@ static void print_sync_parameters(FILE* f) {
 
 extern "C"
 void register_no_clock_sync_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("None").c_str();;
+  //sync_mod->name = (char*)std::string("None").c_str();;
   sync_mod->clocksync = MPITS_CLOCKSYNC_NONE;
 
   sync_mod->init_module = empty_init_module;

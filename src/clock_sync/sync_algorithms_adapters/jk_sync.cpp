@@ -75,7 +75,7 @@ void jk_cleanup_module(void) {
 
 extern "C"
 void register_jk_module(mpits_clocksync_t *sync_mod) {
-  sync_mod->name = (char*)std::string("JK").c_str();
+  //sync_mod->name = (char*)std::string("JK").c_str();
   sync_mod->clocksync = MPITS_CLOCKSYNC_JK;
 
   sync_mod->init_module = jk_init_module;
