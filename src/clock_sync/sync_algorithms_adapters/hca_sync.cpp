@@ -59,7 +59,7 @@ static void hca_common_print(FILE* f)
 static void hca_print_sync_parameters(FILE* f)
 {
   hca_common_print(f);
-  fprintf (f, "#@clocksync=HCA\n");
+  fprintf(f, "#@clocksync=HCA\n");
   fprintf(f, "#@hcasynctype=linear\n");
 }
 

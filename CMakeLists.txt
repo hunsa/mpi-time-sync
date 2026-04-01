@@ -12,6 +12,11 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 find_package(MPI REQUIRED)
 
 option(BUILD_EXAMPLES "Build mpits examples" OFF)
+option(BUILD_SANITY_CHECKS "Enable building sanity checks" OFF)
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Configure the installation paths
 set(MPITS_INSTALL_INCLUDEDIR ${CMAKE_INSTALL_INCLUDEDIR})
@@ -146,6 +151,10 @@ add_executable(check_clock_accuracy
 SET_TARGET_PROPERTIES(check_clock_accuracy PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 TARGET_LINK_LIBRARIES(check_clock_accuracy PRIVATE mpits MPI::MPI_CXX)
 endif ()
+
+if (BUILD_SANITY_CHECKS)
+    ADD_SUBDIRECTORY(test/sanity_check)
+endif()
 
 configure_package_config_file(cmake_modules/mpits-config.cmake.in
         ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake

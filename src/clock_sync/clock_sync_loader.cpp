@@ -21,13 +21,10 @@
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 #include "helpers/dict/mpits_dict.h"
 #include "helpers/dict/cli_param_parser.h"
-//#include "clock_sync/clock_sync_common.h"
-//#include "clock_sync/clock_sync_lib.h"
-//#include "common/sync_module_helpers.h"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
+#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
+//#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 static std::vector<std::string> str_split(const char *str, char c);
