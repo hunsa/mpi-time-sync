@@ -190,7 +190,9 @@ target_include_directories(mpits
 target_compile_definitions(mpits PRIVATE ZF_LOG_DEF_LEVEL=${MPITS_ZF_LOG_LEVEL})
 
 SET_TARGET_PROPERTIES(mpits PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries(mpits PUBLIC ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m MPI::MPI_CXX)
+target_link_libraries(mpits
+        PUBLIC MPI::MPI_C
+        PRIVATE ${GSL_LIBRARIES} ${MY_ADDITIONAL_LIBS} m)
 
 
 if(BUILD_EXAMPLES)
@@ -212,13 +214,17 @@ if (BUILD_SANITY_CHECKS)
 endif()
 
 configure_package_config_file(cmake_modules/mpits-config.cmake.in
-        ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake
+        ${PROJECT_BINARY_DIR}/mpits-config.cmake
         INSTALL_DESTINATION ${MPITS_INSTALL_CMAKEDIR}
         PATH_VARS   MPITS_INSTALL_LIBDIR
                     MPITS_INSTALL_INCLUDEDIR
                     MPITS_INSTALL_BINDIR
                     MPITS_INSTALL_LIBEXECDIR
                     MPITS_INSTALL_CMAKEDIR)
+write_basic_package_version_file(
+        ${PROJECT_BINARY_DIR}/mpits-config-version.cmake
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion)
 
 install(TARGETS mpits
         EXPORT mpits-targets
@@ -227,7 +233,8 @@ install(TARGETS mpits
         RUNTIME DESTINATION ${MPITS_INSTALL_BINDIR}
 		PUBLIC_HEADER DESTINATION ${MPITS_INSTALL_INCLUDEDIR})
 
-install(FILES ${PROJECT_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/mpits-config.cmake
+install(FILES ${PROJECT_BINARY_DIR}/mpits-config.cmake
+              ${PROJECT_BINARY_DIR}/mpits-config-version.cmake
         DESTINATION ${MPITS_INSTALL_CMAKEDIR})
 
 install(EXPORT mpits-targets # rules to export the targets built here
