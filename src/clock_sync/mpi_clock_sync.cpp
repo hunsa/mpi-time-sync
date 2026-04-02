@@ -3,6 +3,9 @@
 #include <cstring>
 #include <cstdlib>
 #include <cassert>
+#include <cctype>
+#include <string>
+#include <vector>
 
 #include "mpits.h"
 #include "mpi_clock_sync_internal.h"
@@ -42,72 +45,109 @@ static const sync_type_t clock_sync_options[] = {
 };
 static const int N_CLOCK_SYNC_TYPES = sizeof(clock_sync_options)/sizeof(sync_type_t);
 static const char CLOCK_SYNC_ARG[] = "clock-sync";
+static const char DEFAULT_MPITS_PARAMS[] = "--clock-sync=HCA3O --params=options:skampi_offset@5@20";
 
-static int compute_argc(char *str) {
-  int i;
-  int cnt = 0;
-  int white = 0;
-  int seenword = 0;
+typedef struct {
+  int argc;
+  char **argv;
+} mpits_owned_argv_t;
 
-  for (i = 0; i < strlen(str); i++) {
-    if (str[i] == ' ') {
-      white = 1;
-    } else {
-      if( i == strlen(str) -1 &&  white == 0 ) {
-        cnt++;
-      } else if (white == 1) {
-        if( seenword == 1 ) {
-          cnt++;
-        }
-      }
-      white = 0;
-      seenword = 1;
-    }
+static mpits_owned_argv_t g_mpits_override_args = {0, nullptr};
+
+static void cleanup_override_lib_env_params() {
+  if (g_mpits_override_args.argv == nullptr) {
+    return;
   }
-  return cnt;
+
+  for (int i = 0; i < g_mpits_override_args.argc; ++i) {
+    free(g_mpits_override_args.argv[i]);
+  }
+  free(g_mpits_override_args.argv);
+  g_mpits_override_args.argc = 0;
+  g_mpits_override_args.argv = nullptr;
+}
+
+static std::vector<std::string> split_args(const char *str) {
+  std::vector<std::string> tokens;
+  if (str == nullptr) {
+    return tokens;
+  }
+
+  const char *cursor = str;
+  while (*cursor != '\0') {
+    while (*cursor != '\0' && std::isspace(static_cast<unsigned char>(*cursor)) != 0) {
+      ++cursor;
+    }
+    if (*cursor == '\0') {
+      break;
+    }
+
+    const char *start = cursor;
+    while (*cursor != '\0' && std::isspace(static_cast<unsigned char>(*cursor)) == 0) {
+      ++cursor;
+    }
+    tokens.emplace_back(start, cursor - start);
+  }
+
+  return tokens;
+}
+
+static void fail_on_invalid_mpits_params(const char *params) {
+  fprintf(stderr, "ERROR: failed to parse MPITS_PARAMS=\"%s\"\n", params != nullptr ? params : "(null)");
+  std::abort();
+}
+
+void cleanup_sync_options(sync_module_info_t* opts_p) {
+  if (opts_p != nullptr && opts_p->name != nullptr) {
+    free(opts_p->name);
+    opts_p->name = nullptr;
+  }
 }
 
 void mpits_check_and_override_lib_env_params(int *argc, char ***argv) {
-  char *env = getenv("MPITS_PARAMS");
-  char **argvnew;
-
-  if( env == NULL ) {
-    env = strdup("--clock-sync=HCA3O --params=options:skampi_offset@5@20");
+  const char *env = getenv("MPITS_PARAMS");
+  if (env == nullptr) {
+    env = DEFAULT_MPITS_PARAMS;
   }
 
-  if( env != NULL ) {
-    char *token;
-    //printf("env:%s\n", env);
-    *argc = compute_argc(env) + 1;  // + 1 is for argv[0], which we'll copy
-    //printf("argc: %d\n", *argc);
+  cleanup_override_lib_env_params();
 
-//    printf("(*argv)[0]=%s\n", (*argv)[0]);
+  std::vector<std::string> tokens = split_args(env);
+  g_mpits_override_args.argc = static_cast<int>(tokens.size()) + 1;
+  g_mpits_override_args.argv = static_cast<char**>(calloc(g_mpits_override_args.argc + 1, sizeof(char*)));
+  if (g_mpits_override_args.argv == nullptr) {
+    fail_on_invalid_mpits_params(env);
+  }
 
-    //  TODO: we should probably free the old argv
-    argvnew = (char**)malloc(*argc * sizeof(char**));
-    // copy old argv[0]
-    argvnew[0] = (char*)"dummy";
+  g_mpits_override_args.argv[0] = strdup("mpits");
+  if (g_mpits_override_args.argv[0] == nullptr) {
+    cleanup_override_lib_env_params();
+    fail_on_invalid_mpits_params(env);
+  }
 
-//    printf("argvnew[0]=%s\n", argvnew[0]);
-
-    char *env_copy = strdup(env);
-    token = strtok(env_copy, " ");
-    if( token != NULL ) {
-//      printf("token: %s\n", token);
-      argvnew[1] = token;
-//      printf("argvnew[1]=%s\n", argvnew[1]);
-      for(int i=2; i<*argc; i++) {
-        token = strtok(NULL, " ");
-        if( token != NULL ) {
-//          printf("token: %s\n", token);
-          argvnew[i] = token;
-        }
-      }
+  for (size_t i = 0; i < tokens.size(); ++i) {
+    g_mpits_override_args.argv[i + 1] = strdup(tokens[i].c_str());
+    if (g_mpits_override_args.argv[i + 1] == nullptr) {
+      cleanup_override_lib_env_params();
+      fail_on_invalid_mpits_params(env);
     }
-
-    *argv = argvnew;
   }
 
+  if (tokens.empty()) {
+    fprintf(stderr, "WARNING: MPITS_PARAMS is empty; using library defaults only\n");
+  }
+
+  *argc = g_mpits_override_args.argc;
+  *argv = g_mpits_override_args.argv;
+}
+
+char* get_name_from_sync_type(const int n_types, const sync_type_t* type_list, int type) {
+  for (int i = 0; i < n_types; ++i) {
+    if (type_list[i].type == type) {
+      return strdup(type_list[i].name);
+    }
+  }
+  return nullptr;
 }
 
 int get_sync_type(const int n_types, const sync_type_t* type_list, const char* name) {
@@ -215,7 +255,7 @@ int MPITS_Init(MPI_Comm comm, mpits_clocksync_t *clocksync) {
   clocksync->init_module(comm, argc, argv);
   clocksync->comm = comm;
 
-  //cleanup_sync_options(&sync_module_info);
+  cleanup_sync_options(&sync_module_info);
 
   return 0;
 }
@@ -245,6 +285,7 @@ double MPITS_Clocksync_get_time(mpits_clocksync_t *clocksync) {
 
 int MPITS_Finalize() {
   MPITS_deregister_sync_modules();
+  cleanup_override_lib_env_params();
   return 0;
 }
 
@@ -273,4 +314,3 @@ void MPITS_register_sync_modules(void) {
 void MPITS_deregister_sync_modules(void) {
   free(sync_modules);
 }
-
