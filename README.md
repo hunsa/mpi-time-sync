@@ -47,6 +47,24 @@ export MPITS_PARAMS="--clock-sync=HCA3O --params=alg:HCA3O@skampi_offset@5@20"
 export MPITS_PARAMS="--clock-sync=HCA3O --params=options:skampi_offset@5@20"
 ```
 
+### HCA2 parameter format
+
+```
+options:<recompute>@<fitpoints>@<offsetalg>@<p1>@<p2>
+```
+
+- `recompute` — `1` to recompute the intercept of the linear model, `0` to skip
+- `fitpoints` — number of fit points for the linear model
+- `offsetalg` — `pingpong_offset` or `skampi_offset` to obtain the fit points for the linear model
+- `p1`, `p2` — parameters passed to the offset algorithm (min ping-pongs, ping-pongs)
+
+If the format string is missing or incomplete, defaults are used: `recompute=1`, `fitpoints=500`, `skampi_offset@5@20`.
+
+Example:
+```
+export MPITS_PARAMS="--clock-sync=HCA2 --params=options:1@500@skampi_offset@5@20"
+```
+
 
 ## Support for hwloc
 
