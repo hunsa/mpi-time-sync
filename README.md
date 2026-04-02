@@ -133,6 +133,42 @@ Example:
 export MPITS_PARAMS="--clock-sync=SKaMPI --params=options:skampi_offset@10@100"
 ```
 
+### Topo2 parameter format
+
+`Topo2` does not use a single `options:` string. It expects two named clock-sync configurations:
+
+```text
+topoalg1:<alg1-spec>,topoalg2:<alg2-spec>
+```
+
+- `topoalg1` — algorithm used for the upper level of the two-level hierarchy
+- `topoalg2` — algorithm used for the lower level
+- Each value is parsed by the generic clock-sync loader, so it uses the same `ALG@...` format as `alg:...`
+
+Recommended example:
+
+```bash
+export MPITS_PARAMS="--clock-sync=Topo2 --params=topoalg1:HCA3@0@500@skampi_offset@10@100,topoalg2:prop@1"
+```
+
+This matches the built-in default behavior:
+- `topoalg1:HCA3@0@500@skampi_offset@10@100`
+- `topoalg2:prop@1`
+
+Examples for `topoalg1`:
+
+```bash
+export MPITS_PARAMS="--clock-sync=Topo2 --params=topoalg1:HCA@500@skampi_offset@5@20,topoalg2:prop@1"
+export MPITS_PARAMS="--clock-sync=Topo2 --params=topoalg1:HCA2@1@500@skampi_offset@5@20,topoalg2:prop@1"
+export MPITS_PARAMS="--clock-sync=Topo2 --params=topoalg1:HCA3@1@500@skampi_offset@5@20,topoalg2:prop@1"
+export MPITS_PARAMS="--clock-sync=Topo2 --params=topoalg1:HCA3O@skampi_offset@5@20,topoalg2:prop@1"
+```
+
+Notes:
+- `prop@0` means offset-only propagation.
+- `prop@1` means linear-model propagation.
+- With `topoalg1:HCA3O@...`, both `topoalg2:prop@0` and `topoalg2:prop@1` are accepted. `prop@0` is the more consistent pairing because `HCA3O` itself is offset-only.
+
 ### HCA3O parameter format
 
 ```

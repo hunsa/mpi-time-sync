@@ -56,6 +56,7 @@ static void topo_print_sync_parameters(FILE* f)
 
 
 static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
+  const char* topo2_default_params = "topoalg1:HCA3@0@500@skampi_offset@10@100,topoalg2:prop@1";
   int use_default = 0;
   BaseClockSync *alg1;
   BaseClockSync *alg2;
@@ -81,7 +82,7 @@ static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
     int rank;
     MPI_Comm_rank(comm, &rank);
     if( rank == 0 ) {
-      ZF_LOGW("!!! using default topo1 clock sync options");
+      ZF_LOGW("using default Topo2 clock sync options: --params=%s", topo2_default_params);
     }
 
     clock_sync = new TwoLevelClockSync(
@@ -106,5 +107,4 @@ void register_topo_aware_sync2_module(mpits_clocksync_t *sync_mod) {
   sync_mod->get_global_time = topo_normalized_time;
   sync_mod->print_sync_info = topo_print_sync_parameters;
 }
-
 
