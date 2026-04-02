@@ -60,6 +60,11 @@ HCA2ClockSync* HCA2ClockSync::from_string(const std::string& str) {
     ZF_LOGW("using default HCA2ClockSync parameters: recompute=%d, fitpoints=%d, offset_alg=skampi_offset@5@20", recompute, n_fitpoints); 
   }
 
+  if (n_fitpoints < 2) {
+    ZF_LOGW("fitpoints=%d is too small, using 2", n_fitpoints);
+    n_fitpoints = 2;
+  }
+
   return new HCA2ClockSync(offset_alg, n_fitpoints, recompute);
 }
 

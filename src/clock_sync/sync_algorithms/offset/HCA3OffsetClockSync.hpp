@@ -1,6 +1,7 @@
 #ifndef MPITS_HCA3OFFSETCLOCKSYNC_H
 #define MPITS_HCA3OFFSETCLOCKSYNC_H
 
+#include <string>
 #include "clock_sync/sync_algorithms/ClockSync.hpp"
 #include "clock_sync/clock_offset_algs/ClockOffsetAlg.hpp"
 
@@ -16,6 +17,9 @@ public:
   ~HCA3OffsetClockSync();
   GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
   GlobalClock* create_global_dummy_clock(MPI_Comm comm, Clock& c);
+
+  // Parse "offsetalg@p1@p2" and return a new instance, or default on error.
+  static HCA3OffsetClockSync* from_string(const std::string& str);
 
 private:
   ClockOffsetAlg *offset_alg;

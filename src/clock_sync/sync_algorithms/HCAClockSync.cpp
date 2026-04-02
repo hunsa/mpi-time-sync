@@ -2,9 +2,13 @@
 
 #include <math.h>
 #include <gsl/gsl_fit.h>
+#include <sstream>
+#include <vector>
 
 #include "HCAClockSync.hpp"
 #include "LinearModelFitterStandard.hpp"
+#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
+#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
 //#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
 #define ZF_LOG_LEVEL ZF_LOG_WARN
@@ -15,6 +19,45 @@ HCAClockSync::HCAClockSync(ClockOffsetAlg *offsetAlg, int n_fitpoints) :
 }
 
 HCAClockSync::~HCAClockSync() {
+}
+
+HCAClockSync* HCAClockSync::from_string(const std::string& str) {
+  int n_fitpoints        = 500;
+  ClockOffsetAlg* offset_alg = new SKaMPIClockOffsetAlg(5, 20);
+
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, '@')) {
+    tokens.push_back(token);
+  }
+
+  if (tokens.size() >= 4) {
+    n_fitpoints     = std::stoi(tokens[0]);
+    std::string alg = tokens[1];
+    int p1          = std::stoi(tokens[2]);
+    int p2          = std::stoi(tokens[3]);
+
+    ClockOffsetAlg* parsed_alg = nullptr;
+    if (alg == "pingpong_offset") {
+      parsed_alg = new PingpongClockOffsetAlg(p1, p2);
+    } else if (alg == "skampi_offset") {
+      parsed_alg = new SKaMPIClockOffsetAlg(p1, p2);
+    }
+    if (parsed_alg != nullptr) {
+      delete offset_alg;
+      offset_alg = parsed_alg;
+    }
+  } else {
+    ZF_LOGW("using default HCAClockSync parameters: fitpoints=%d, offset_alg=skampi_offset@5@20", n_fitpoints);
+  }
+
+  if (n_fitpoints < 2) {
+    ZF_LOGW("fitpoints=%d is too small, using 2", n_fitpoints);
+    n_fitpoints = 2;
+  }
+
+  return new HCAClockSync(offset_alg, n_fitpoints);
 }
 
 /**

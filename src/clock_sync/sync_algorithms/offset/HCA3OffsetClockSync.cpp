@@ -1,6 +1,11 @@
 
 #include "HCA3OffsetClockSync.hpp"
 #include <math.h>
+#include <sstream>
+#include <vector>
+
+#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
+#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
 #include "time_provider/clocks/GlobalClockOffset.hpp"
 //#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
@@ -15,6 +20,38 @@ offset_alg(offsetAlg)
 
 HCA3OffsetClockSync::~HCA3OffsetClockSync() {
   delete offset_alg;
+}
+
+HCA3OffsetClockSync* HCA3OffsetClockSync::from_string(const std::string& str) {
+  ClockOffsetAlg* offset_alg = new SKaMPIClockOffsetAlg(5, 20);
+
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, '@')) {
+    tokens.push_back(token);
+  }
+
+  if (tokens.size() >= 3) {
+    std::string alg = tokens[0];
+    int p1          = std::stoi(tokens[1]);
+    int p2          = std::stoi(tokens[2]);
+
+    ClockOffsetAlg* parsed_alg = nullptr;
+    if (alg == "pingpong_offset") {
+      parsed_alg = new PingpongClockOffsetAlg(p1, p2);
+    } else if (alg == "skampi_offset") {
+      parsed_alg = new SKaMPIClockOffsetAlg(p1, p2);
+    }
+    if (parsed_alg != nullptr) {
+      delete offset_alg;
+      offset_alg = parsed_alg;
+    }
+  } else {
+    ZF_LOGW("using default HCA3OffsetClockSync parameters: offset_alg=skampi_offset@5@20");
+  }
+
+  return new HCA3OffsetClockSync(offset_alg);
 }
 
 

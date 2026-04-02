@@ -1,6 +1,7 @@
 #ifndef MPITS_HCACLOCKSYNC_CLASS_H_
 #define MPITS_HCACLOCKSYNC_CLASS_H_
 
+#include <string>
 #include <mpi.h>
 
 #include "HCAAbstractClockSync.hpp"
@@ -25,6 +26,9 @@ public:
   ~HCAClockSync();
 
   GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
+
+  // Parse "fitpoints@offsetalg@p1@p2" and return a new instance, or default on error.
+  static HCAClockSync* from_string(const std::string& str);
 };
 
 #endif /*  MPITS_HCACLOCKSYNC_CLASS_H_  */

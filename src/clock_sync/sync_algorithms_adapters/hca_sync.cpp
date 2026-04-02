@@ -68,22 +68,15 @@ static void hca_print_sync_parameters(FILE* f)
 
 
 static void hca_init_module(MPI_Comm comm, int argc, char** argv) {
-  ClockSyncLoader loader;
-
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync(comm, "alg");
-  if( clock_sync != NULL ) {
-    // now we make sure it's really an HCA instance
-    if( dynamic_cast<HCAClockSync*>(clock_sync) == NULL ) {
-      ZF_LOGE("instantiated clock sync is not of type HCA. aborting..");
-      exit(1);
-    }
-  } else {
-    ZF_LOGV("using default hca clock sync");
-    clock_sync = new HCAClockSync(new PingpongClockOffsetAlg(100,100), 1000);
+  char *options;
+  mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+  if (options == NULL) {
+    options = (char*)"";
   }
+  clock_sync = HCAClockSync::from_string(std::string(options));
 }
 
 
@@ -124,24 +117,15 @@ static void hca2_init_module(MPI_Comm comm, int argc, char** argv) {
  */
 
 static void hca3_init_module(MPI_Comm comm, int argc, char** argv) {
-  ClockSyncLoader loader;
-
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync(comm, "alg");
-  if( clock_sync != NULL ) {
-    // now we make sure it's really an HCA3 instance
-    if( dynamic_cast<HCA3ClockSync*>(clock_sync) == NULL ) {
-      ZF_LOGE("instantiated clock sync is not of type HCA3. aborting..");
-      exit(1);
-    }
-  } else {
-    ZF_LOGV("using default hca3 clock sync");
-    clock_sync = new HCA3ClockSync(new PingpongClockOffsetAlg(100,100), 1000, false);
+  char *options;
+  mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+  if (options == NULL) {
+    options = (char*)"";
   }
-
-
+  clock_sync = HCA3ClockSync::from_string(std::string(options));
 }
 
 static void hca3_print_sync_parameters(FILE* f)
@@ -156,23 +140,15 @@ static void hca3_print_sync_parameters(FILE* f)
  */
 
 static void hca3_offset_init_module(MPI_Comm comm, int argc, char** argv) {
-    ClockSyncLoader loader;
-
     global_clock = NULL;
     local_clock = initialize_local_clock();
 
-    clock_sync = loader.instantiate_clock_sync(comm, "alg");
-    if( clock_sync != NULL ) {
-        // now we make sure it's really an HCA3Offset instance
-        if( dynamic_cast<HCA3OffsetClockSync*>(clock_sync) == NULL ) {
-            ZF_LOGE("instantiated clock sync is not of type HCA3OffsetClockSync. aborting..");
-            exit(1);
-        }
-    } else {
-        ZF_LOGV("using default HCA3O clock sync");
-        clock_sync = new HCA3OffsetClockSync(new SKaMPIClockOffsetAlg(5,20));
+    char *options;
+    mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+    if (options == NULL) {
+        options = (char*)"";
     }
-
+    clock_sync = HCA3OffsetClockSync::from_string(std::string(options));
 }
 
 static void hca3_offset_print_sync_parameters(FILE* f)
