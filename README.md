@@ -44,6 +44,7 @@ The following clock synchronization algorithms are available:
 
 ```
 export MPITS_PARAMS="--clock-sync=HCA3O --params=alg:HCA3O@skampi_offset@5@20"
+export MPITS_PARAMS="--clock-sync=HCA3O --params=options:skampi_offset@5@20"
 ```
 
 

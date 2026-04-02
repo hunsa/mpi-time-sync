@@ -16,6 +16,9 @@
 #include "clock_sync/sync_algorithms/HCA3ClockSync.hpp"
 #include "clock_sync/sync_algorithms/offset/HCA3OffsetClockSync.hpp"
 
+#include "helpers/dict/mpits_dict.h"
+#include "helpers/dict/cli_param_parser.h"
+
 //#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
 #define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
@@ -104,17 +107,13 @@ static void hca2_init_module(MPI_Comm comm, int argc, char** argv) {
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync(comm, "alg");
-  if( clock_sync != NULL ) {
-    // now we make sure it's really an HCA2 instance
-    if( dynamic_cast<HCA2ClockSync*>(clock_sync) == NULL ) {
-      ZF_LOGE("instantiated clock sync is not of type HCA2. aborting..");
-      exit(1);
-    }
-  } else {
-    ZF_LOGV("using default HCA2 clock sync");
-    clock_sync = new HCA2ClockSync(new PingpongClockOffsetAlg(100,100), 1000, false);
+  //clock_sync = loader.instantiate_clock_sync(comm, "alg");
+  char *options;
+  mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+  if(options == NULL) {
+    options = (char*)"";
   }
+  clock_sync = HCA2ClockSync::from_string(std::string(options));
 }
 
 

@@ -1,6 +1,7 @@
 #ifndef MPITS_HCA2CLOCKSYNC_CLASS_H_
 #define MPITS_HCA2CLOCKSYNC_CLASS_H_
 
+#include <string>
 #include <mpi.h>
 
 #include "time_provider/clocks/Clock.hpp"
@@ -20,6 +21,9 @@ protected:
 public:
   HCA2ClockSync(ClockOffsetAlg *offsetAlg, int n_fitpoints, bool recompute_intercept);
   ~HCA2ClockSync();
+
+  // Parse "recompute@fitpoints@offsetalg@p1@p2" and return a new instance, or nullptr on error.
+  static HCA2ClockSync* from_string(const std::string& str);
 
   //GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
 };
