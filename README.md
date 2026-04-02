@@ -100,6 +100,39 @@ Example:
 export MPITS_PARAMS="--clock-sync=HCA3 --params=options:1@500@skampi_offset@5@20"
 ```
 
+### JK parameter format
+
+```
+options:<fitpoints>@<offsetalg>@<p1>@<p2>
+```
+
+- `fitpoints` — number of fit points for the linear model
+- `offsetalg` — `pingpong_offset` or `skampi_offset`
+- `p1`, `p2` — parameters passed to the offset algorithm
+
+If the format string is missing or incomplete, defaults are used: `fitpoints=1000`, `pingpong_offset@100@100`.
+
+Example:
+```
+export MPITS_PARAMS="--clock-sync=JK --params=options:1000@pingpong_offset@100@100"
+```
+
+### SKaMPI parameter format
+
+```
+options:<offsetalg>@<p1>@<p2>
+```
+
+- `offsetalg` — `pingpong_offset` or `skampi_offset`
+- `p1`, `p2` — parameters passed to the offset algorithm
+
+If the format string is missing or incomplete, defaults are used: `skampi_offset@10@100`.
+
+Example:
+```
+export MPITS_PARAMS="--clock-sync=SKaMPI --params=options:skampi_offset@10@100"
+```
+
 ### HCA3O parameter format
 
 ```

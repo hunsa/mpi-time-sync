@@ -2,6 +2,8 @@
 #ifndef MPITS_SKAMPICLOCKSYNC_CLASS_H_
 #define MPITS_SKAMPICLOCKSYNC_CLASS_H_
 
+#include <string>
+
 #include "time_provider/clocks/Clock.hpp"
 #include "clock_sync/clock_offset_algs/ClockOffsetAlg.hpp"
 #include "clock_sync/sync_algorithms/ClockSync.hpp"
@@ -17,6 +19,8 @@ private:
 public:
 	SKaMPIClockSync(ClockOffsetAlg *offsetAlg);
   ~SKaMPIClockSync();
+
+  static SKaMPIClockSync* from_string(const std::string& str);
 
   GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
   GlobalClock* create_global_dummy_clock(MPI_Comm comm, Clock& c);

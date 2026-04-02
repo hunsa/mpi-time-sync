@@ -6,10 +6,18 @@
  */
 
 #include <assert.h>
+#include <sstream>
+#include <vector>
 #include <mpi.h>
 
 #include "SKaMPIClockSync.hpp"
 #include "time_provider/clocks/GlobalClockOffset.hpp"
+#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
+#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
+
+//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
+#define ZF_LOG_LEVEL ZF_LOG_WARN
+#include "log/zf_log.h"
 
 SKaMPIClockSync::SKaMPIClockSync(ClockOffsetAlg *offsetAlg) {
   this->offset_alg = offsetAlg;
@@ -19,6 +27,38 @@ SKaMPIClockSync::SKaMPIClockSync(ClockOffsetAlg *offsetAlg) {
 SKaMPIClockSync::~SKaMPIClockSync() {
 //  delete[] offset_algs;
   delete[] tds;
+}
+
+SKaMPIClockSync* SKaMPIClockSync::from_string(const std::string& str) {
+  ClockOffsetAlg* offset_alg = new SKaMPIClockOffsetAlg(10, 100);
+
+  std::vector<std::string> tokens;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, '@')) {
+    tokens.push_back(token);
+  }
+
+  if (tokens.size() >= 3) {
+    std::string alg = tokens[0];
+    int p1 = std::stoi(tokens[1]);
+    int p2 = std::stoi(tokens[2]);
+
+    ClockOffsetAlg* parsed_alg = nullptr;
+    if (alg == "pingpong_offset") {
+      parsed_alg = new PingpongClockOffsetAlg(p1, p2);
+    } else if (alg == "skampi_offset") {
+      parsed_alg = new SKaMPIClockOffsetAlg(p1, p2);
+    }
+    if (parsed_alg != nullptr) {
+      delete offset_alg;
+      offset_alg = parsed_alg;
+    }
+  } else {
+    ZF_LOGW("using default SKaMPIClockSync parameters: offset_alg=skampi_offset@10@100");
+  }
+
+  return new SKaMPIClockSync(offset_alg);
 }
 
 
@@ -77,6 +117,5 @@ GlobalClock* SKaMPIClockSync::synchronize_all_clocks(MPI_Comm comm, Clock& c) {
 GlobalClock* SKaMPIClockSync::create_global_dummy_clock(MPI_Comm comm, Clock& c) {
   return new GlobalClockOffset(c, 0.0);
 }
-
 
 

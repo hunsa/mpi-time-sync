@@ -21,14 +21,14 @@
 #include "time_provider/clocks/Clock.hpp"
 #include "time_provider/clocks/GlobalClockOffset.hpp"
 
+#include "clock_sync/mpi_clock_sync_internal.h"
 #include "clock_sync/clock_sync_common.h"
-#include "clock_sync/clock_sync_loader.hpp"
-
-#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
-#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
 #include "clock_sync/sync_algorithms/ClockSync.hpp"
 #include "clock_sync/sync_algorithms/offset/SKaMPIClockSync.hpp"
+
+#include "helpers/dict/mpits_dict.h"
+#include "helpers/dict/cli_param_parser.h"
 
 
 //#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
@@ -59,23 +59,15 @@ static double get_normalized_time(double local_time) {
 }
 
 void sk_init_module(MPI_Comm comm, int argc, char** argv) {
-  ClockSyncLoader loader;
-
   global_clock = NULL;
   local_clock = initialize_local_clock();
 
-  clock_sync = loader.instantiate_clock_sync(comm, "alg");
-  if( clock_sync != NULL ) {
-    // now we make sure it's really a SKaMPI clock sync instance
-    if( dynamic_cast<SKaMPIClockSync*>(clock_sync) == NULL ) {
-      ZF_LOGE("instantiated clock sync is not of type SKaMPIClockSync. aborting..");
-      exit(1);
-    }
-  } else {
-    ZF_LOGV("using default SKaMPI clock sync");
-    clock_sync = new SKaMPIClockSync(new SKaMPIClockOffsetAlg(10,100));
+  char *options;
+  mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+  if (options == NULL) {
+    options = (char*)"";
   }
-
+  clock_sync = SKaMPIClockSync::from_string(std::string(options));
 }
 
 void sk_cleanup_module(void) {
@@ -103,4 +95,3 @@ void register_skampi_module(mpits_clocksync_t *sync_mod) {
   sync_mod->get_global_time = get_normalized_time;
   sync_mod->print_sync_info = sk_print_sync_parameters;
 }
-

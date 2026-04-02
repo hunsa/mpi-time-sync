@@ -1,6 +1,7 @@
 #ifndef MPITS_JKCLOCKSYNC_CLASS_H_
 #define MPITS_JKCLOCKSYNC_CLASS_H_
 
+#include <string>
 
 #include "time_provider/clocks/Clock.hpp"
 #include "time_provider/clocks/GlobalClockLM.hpp"
@@ -19,6 +20,8 @@ private:
 public:
   JKClockSync(ClockOffsetAlg *offsetAlg, int n_fitpoints);
   ~JKClockSync();
+
+  static JKClockSync* from_string(const std::string& str);
 
   GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
   GlobalClock* create_global_dummy_clock(MPI_Comm comm, Clock& c);
