@@ -2,15 +2,85 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
+#include <sstream>
+#include <vector>
 #include <mpi.h>
 
 #include "HierarchicalClockSync.hpp"
 
 #include "time_provider/clocks/GlobalClockLM.hpp"
 #include "time_provider/clocks/GlobalClockOffset.hpp"
+#include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
+#include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
+#include "clock_sync/sync_algorithms/HCAClockSync.hpp"
+#include "clock_sync/sync_algorithms/HCA2ClockSync.hpp"
+#include "clock_sync/sync_algorithms/HCA3ClockSync.hpp"
+#include "clock_sync/sync_algorithms/JKClockSync.hpp"
+#include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
+#include "clock_sync/sync_algorithms/offset/HCA3OffsetClockSync.hpp"
+#include "clock_sync/sync_algorithms/offset/SKaMPIClockSync.hpp"
 #include "clock_sync/sync_algorithms/utils/hwloc_helpers.h"
 
 #include "log/zf_log.h"
+
+static BaseClockSync* instantiate_topo_alg_from_string(const std::string& spec) {
+  std::vector<std::string> tokens;
+  std::stringstream ss(spec);
+  std::string token;
+  while (std::getline(ss, token, '@')) {
+    tokens.push_back(token);
+  }
+
+  if (tokens.empty()) {
+    return nullptr;
+  }
+
+  const std::string sync_alg = tokens[0];
+  const std::string rest = spec.size() > sync_alg.size() ? spec.substr(sync_alg.size() + 1) : "";
+
+  if (sync_alg == "HCA") {
+    return HCAClockSync::from_string(rest);
+  }
+  if (sync_alg == "HCA2") {
+    return HCA2ClockSync::from_string(rest);
+  }
+  if (sync_alg == "HCA3") {
+    return HCA3ClockSync::from_string(rest);
+  }
+  if (sync_alg == "HCA3O") {
+    return HCA3OffsetClockSync::from_string(rest);
+  }
+  if (sync_alg == "SKaMPI") {
+    if (tokens.size() >= 4) {
+      ClockOffsetAlg* offset_alg = nullptr;
+      if (tokens[1] == "pingpong_offset") {
+        offset_alg = new PingpongClockOffsetAlg(std::stoi(tokens[2]), std::stoi(tokens[3]));
+      } else if (tokens[1] == "skampi_offset") {
+        offset_alg = new SKaMPIClockOffsetAlg(std::stoi(tokens[2]), std::stoi(tokens[3]));
+      }
+      if (offset_alg != nullptr) {
+        return new SKaMPIClockSync(offset_alg);
+      }
+    }
+    return SKaMPIClockSync::from_string("");
+  }
+  if (sync_alg == "JK") {
+    return JKClockSync::from_string(rest);
+  }
+  if (sync_alg == "prop") {
+    if (tokens.size() >= 2 && tokens[1] == "0") {
+      return new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_OFFSET);
+    }
+    if (tokens.size() >= 2 && tokens[1] == "1") {
+      return new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_LM);
+    }
+    ZF_LOGW("problem with format of prop clock sync '%s', using prop@1", spec.c_str());
+    return new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_LM);
+  }
+
+  ZF_LOGW("unknown Topo1 sub-algorithm '%s'", spec.c_str());
+  return nullptr;
+}
 
 HierarchicalClockSync::HierarchicalClockSync(BaseClockSync *syncInterNode,
                                              BaseClockSync *syncSocket,
@@ -43,6 +113,41 @@ HierarchicalClockSync::~HierarchicalClockSync() {
     MPI_Comm_free(&comm_intrasocket);
   }
 
+}
+
+HierarchicalClockSync* HierarchicalClockSync::from_string(const std::string& str) {
+  const char* default_spec = "HCA3@0@500@skampi_offset@10@100;HCA3@0@500@skampi_offset@10@100;prop@1";
+  std::vector<std::string> levels;
+  std::stringstream ss(str);
+  std::string token;
+  while (std::getline(ss, token, ';')) {
+    levels.push_back(token);
+  }
+
+  if (levels.size() != 3) {
+    ZF_LOGW("using default Topo1 parameters: options:%s", default_spec);
+    return new HierarchicalClockSync(
+      new HCA3ClockSync(new SKaMPIClockOffsetAlg(10, 100), 500, false),
+      new HCA3ClockSync(new SKaMPIClockOffsetAlg(10, 100), 500, false),
+      new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_LM));
+  }
+
+  BaseClockSync* alg1 = instantiate_topo_alg_from_string(levels[0]);
+  BaseClockSync* alg2 = instantiate_topo_alg_from_string(levels[1]);
+  BaseClockSync* alg3 = instantiate_topo_alg_from_string(levels[2]);
+
+  if (alg1 == nullptr || alg2 == nullptr || alg3 == nullptr) {
+    delete alg1;
+    delete alg2;
+    delete alg3;
+    ZF_LOGW("using default Topo1 parameters because parsing failed: options:%s", default_spec);
+    return new HierarchicalClockSync(
+      new HCA3ClockSync(new SKaMPIClockOffsetAlg(10, 100), 500, false),
+      new HCA3ClockSync(new SKaMPIClockOffsetAlg(10, 100), 500, false),
+      new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_LM));
+  }
+
+  return new HierarchicalClockSync(alg1, alg2, alg3);
 }
 
 void HierarchicalClockSync::initialized_communicators(MPI_Comm comm) {

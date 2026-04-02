@@ -192,6 +192,52 @@ Notes:
 - `prop@1` means linear-model propagation.
 - With `topoalg1:HCA3O@...`, both `topoalg2:prop@0` and `topoalg2:prop@1` are accepted. `prop@0` is the more consistent pairing because `HCA3O` itself is offset-only.
 
+### Topo1 parameter format
+
+`Topo1` supports two ways to configure its three hierarchy levels.
+
+Recommended `options:` format:
+
+```text
+options:<topoalg1-spec>;<topoalg2-spec>;<topoalg3-spec>
+```
+
+- `topoalg1` runs on the inter-node communicator
+- `topoalg2` runs on the inter-socket communicator inside a node
+- `topoalg3` runs on the intra-socket communicator
+- This format is recommended because it works cleanly with the `--params` key-value parser
+
+Recommended example:
+
+```bash
+export MPITS_PARAMS="--clock-sync=Topo1 --params=options:HCA3@0@500@skampi_offset@10@100;HCA3@0@500@skampi_offset@10@100;prop@1"
+```
+
+Built-in default behavior:
+
+```text
+options:HCA3@0@500@skampi_offset@10@100;HCA3@0@500@skampi_offset@10@100;prop@1
+```
+
+Alternative legacy format:
+
+```text
+topoalg1:<alg1-spec>,topoalg2:<alg2-spec>,topoalg3:<alg3-spec>
+```
+
+Examples:
+
+```bash
+export MPITS_PARAMS="--clock-sync=Topo1 --params=options:HCA3@0@500@skampi_offset@10@100;HCA3@0@500@skampi_offset@10@100;prop@1"
+export MPITS_PARAMS="--clock-sync=Topo1 --params=options:HCA3@0@500@skampi_offset@10@100;HCA3O@skampi_offset@10@100;prop@0"
+export MPITS_PARAMS="--clock-sync=Topo1 --params=options:HCA2@1@500@skampi_offset@10@100;HCA2@1@500@skampi_offset@10@100;HCA3O@skampi_offset@10@100"
+```
+
+Hwloc notes:
+- `Topo1` is only available when MPITS is built with `hwloc` support.
+- The socket-aware middle and inner levels depend on `hwloc` being able to determine a unique socket for each rank.
+- If socket detection fails, MPITS falls back to treating the node as a single socket.
+
 ### HCA3O parameter format
 
 ```

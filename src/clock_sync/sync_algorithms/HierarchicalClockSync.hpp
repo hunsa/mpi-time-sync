@@ -2,6 +2,8 @@
 #ifndef MPITS_HIERARCHICALCLOCKSYNC_CLASS_H_
 #define MPITS_HIERARCHICALCLOCKSYNC_CLASS_H_
 
+#include <string>
+
 #include "time_provider/clocks/Clock.hpp"
 #include "time_provider/clocks/GlobalClock.hpp"
 #include "ClockSync.hpp"
@@ -28,6 +30,8 @@ private:
 public:
   HierarchicalClockSync(BaseClockSync *syncInterNode, BaseClockSync *syncSocket, BaseClockSync *syncOnSocket); //, SyncConfiguration& conf);
   ~HierarchicalClockSync();
+
+  static HierarchicalClockSync* from_string(const std::string& str);
 
   GlobalClock* synchronize_all_clocks(MPI_Comm comm, Clock& c);
 };

@@ -26,6 +26,8 @@
 #include "clock_sync/sync_algorithms/HCA3ClockSync.hpp"
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 
+#include "helpers/dict/mpits_dict.h"
+#include "helpers/dict/cli_param_parser.h"
 
 #include "log/zf_log.h"
 
@@ -61,11 +63,21 @@ static void topo_print_sync_parameters(FILE* f)
 
 
 static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
+  const char* topo1_default_params = "options:HCA3@0@500@skampi_offset@10@100;HCA3@0@500@skampi_offset@10@100;prop@1";
   int use_default = 0;
   BaseClockSync *alg1;
   BaseClockSync *alg2;
   BaseClockSync *alg3;
   ClockSyncLoader loader;
+  char *options = NULL;
+
+  mpits_get_value_from_dict(mpits_get_global_param_store(), "options", &options);
+  if (options != NULL && std::string(options).empty() == false) {
+    global_clock = nullptr;
+    local_clock = initialize_local_clock();
+    clock_sync = HierarchicalClockSync::from_string(std::string(options));
+    return;
+  }
 
 
   alg1 = loader.instantiate_clock_sync(comm, "topoalg1");
@@ -91,7 +103,7 @@ static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
   local_clock  = initialize_local_clock();
 
   if( use_default == 1 ) {
-    ZF_LOGW("!!! using default topo1 clock sync options");
+    ZF_LOGW("using default Topo1 clock sync options: --params=%s", topo1_default_params);
 
     clock_sync = new HierarchicalClockSync(
       new HCA3ClockSync(new SKaMPIClockOffsetAlg(10,100), 500, false),
