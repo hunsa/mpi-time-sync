@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 3.24)
+if(POLICY CMP0144)
+  cmake_policy(SET CMP0144 NEW)
+endif()
 
 project(mpi_time_sync VERSION 1.0 LANGUAGES C CXX)
 
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
+include(FindPackageHandleStandardArgs)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_C_STANDARD 99)
@@ -38,7 +42,6 @@ include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}")
 include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/include")
 include_directories(BEFORE "${CMAKE_CURRENT_BINARY_DIR}/src")
 
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake_modules")
 SET(MY_COMPILE_FLAGS "")
 SET(MY_ADDITIONAL_LIBS "")
 
@@ -53,15 +56,55 @@ else(GSL_INCLUDE_DIR)
     message (FATAL_ERROR "GSL libraries not found.")
 endif(GSL_INCLUDE_DIR)
 
-find_package(Hwloc)
+set(HWLOC_ROOT "" CACHE PATH "Optional root directory of a hwloc installation")
+set(HWLOC_FOUND FALSE)
+
+find_package(hwloc CONFIG QUIET)
+if(TARGET hwloc)
+    set(HWLOC_FOUND TRUE)
+    set(HWLOC_TARGET hwloc)
+elseif(TARGET Hwloc::hwloc)
+    set(HWLOC_FOUND TRUE)
+    set(HWLOC_TARGET Hwloc::hwloc)
+else()
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(PC_HWLOC QUIET hwloc)
+    endif()
+
+    find_path(HWLOC_INCLUDE_DIR
+        NAMES hwloc.h
+        HINTS ${HWLOC_ROOT} ${PC_HWLOC_INCLUDE_DIRS}
+        PATH_SUFFIXES include
+    )
+
+    find_library(HWLOC_LIBRARY
+        NAMES hwloc
+        HINTS ${HWLOC_ROOT} ${PC_HWLOC_LIBRARY_DIRS}
+        PATH_SUFFIXES lib
+    )
+
+    find_package_handle_standard_args(HWLOC DEFAULT_MSG HWLOC_INCLUDE_DIR HWLOC_LIBRARY)
+    if(HWLOC_FOUND)
+        add_library(Hwloc::Hwloc UNKNOWN IMPORTED)
+        set_target_properties(Hwloc::Hwloc PROPERTIES
+            IMPORTED_LOCATION "${HWLOC_LIBRARY}"
+            INTERFACE_INCLUDE_DIRECTORIES "${HWLOC_INCLUDE_DIR}"
+        )
+        set(HWLOC_TARGET Hwloc::Hwloc)
+    endif()
+endif()
+
 if (HWLOC_FOUND)
-    message (STATUS "HWLOC INCLUDES: ${HWLOC_INCLUDE_DIR}")
+    if(HWLOC_INCLUDE_DIR)
+        message(STATUS "HWLOC INCLUDES: ${HWLOC_INCLUDE_DIR}")
+    endif()
     SET(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS} -DHAVE_HWLOC")
-    SET(MY_ADDITIONAL_LIBS ${HWLOC_LIBRARY} ${MY_ADDITIONAL_LIBS})
+    SET(MY_ADDITIONAL_LIBS ${HWLOC_TARGET} ${MY_ADDITIONAL_LIBS})
     set(MPITS_REQUIRES "${MPITS_REQUIRES} hwloc")
-else(HWLOC_FOUND)
+else()
     message (STATUS "The HWLOC library was not found. Compiling without HWLOC support.")
-endif(HWLOC_FOUND)
+endif()
 
 option(ENABLE_GETTIME_REALTIME "Use clock_gettime(CLOCK_REALTIME) for time measurements [default: MPI_Wtime()]" off)
 option(ENABLE_GETTIME_MONOTONIC "Use clock_gettime(CLOCK_MONOTONIC) for time measurements [default: MPI_Wtime()]" off)

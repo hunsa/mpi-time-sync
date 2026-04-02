@@ -109,11 +109,6 @@ static void topo_init_module(MPI_Comm comm, int argc, char** argv) {
       new HCA3ClockSync(new SKaMPIClockOffsetAlg(10,100), 500, false),
       new HCA3ClockSync(new SKaMPIClockOffsetAlg(10,100), 500, false),
       new ClockPropagationSync(ClockPropagationSync::ClockType::CLOCK_LM));
-
-    //new HCA3ClockSync(new PingpongClockOffsetAlg(), 1000, 100),
-    //new ClockPropagationSync(),
-    //new HCA3ClockSync(new PingpongClockOffsetAlg(), 1000, 100),
-    //new HCA3ClockSync(new PingpongClockOffsetAlg(), 1000, 100));
   }
 
 }
