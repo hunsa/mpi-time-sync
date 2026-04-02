@@ -10,8 +10,6 @@
 #include "time_provider/clocks/GlobalClockOffset.hpp"
 #include "clock_sync/sync_algorithms/utils/hwloc_helpers.h"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 HierarchicalClockSync::HierarchicalClockSync(BaseClockSync *syncInterNode,
@@ -181,4 +179,3 @@ GlobalClock* HierarchicalClockSync::synchronize_all_clocks(MPI_Comm comm, Clock&
 
   return global_clock3;
 }
-

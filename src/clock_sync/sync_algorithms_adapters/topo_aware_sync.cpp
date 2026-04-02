@@ -27,8 +27,6 @@
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 static ClockSync* clock_sync;

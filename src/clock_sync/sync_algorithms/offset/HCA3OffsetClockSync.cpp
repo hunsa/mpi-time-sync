@@ -8,8 +8,6 @@
 #include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
 #include "time_provider/clocks/GlobalClockOffset.hpp"
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 
@@ -137,5 +135,4 @@ GlobalClock* HCA3OffsetClockSync::synchronize_all_clocks(MPI_Comm comm, Clock& c
 GlobalClock* HCA3OffsetClockSync::create_global_dummy_clock(MPI_Comm comm, Clock& c) {
   return new GlobalClockOffset(c, 0.0);
 }
-
 

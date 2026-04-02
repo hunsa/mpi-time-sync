@@ -7,8 +7,6 @@
 #include "LinearModelFitterStandard.hpp"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 HCAAbstractClockSync::HCAAbstractClockSync(ClockOffsetAlg *offsetAlg, int n_fitpoints) :
@@ -143,4 +141,3 @@ int HCAAbstractClockSync::my_pow_2(int exp) {
 GlobalClock* HCAAbstractClockSync::create_global_dummy_clock(MPI_Comm comm, Clock& c) {
   return new GlobalClockLM(c, 0.0, 0.0);
 }
-

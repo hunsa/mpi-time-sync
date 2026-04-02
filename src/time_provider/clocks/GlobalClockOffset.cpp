@@ -3,8 +3,6 @@
 #include "Clock.hpp"
 #include "GlobalClockOffset.hpp"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 GlobalClockOffset::GlobalClockOffset(Clock& c, double tdiff) :

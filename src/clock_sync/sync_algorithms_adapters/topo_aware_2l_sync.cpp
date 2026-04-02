@@ -17,8 +17,6 @@
 #include "clock_sync/sync_algorithms/ClockPropagationSync.hpp"
 #include "clock_sync/sync_algorithms/TwoLevelClockSync.hpp"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 static ClockSync* clock_sync;
@@ -107,4 +105,3 @@ void register_topo_aware_sync2_module(mpits_clocksync_t *sync_mod) {
   sync_mod->get_global_time = topo_normalized_time;
   sync_mod->print_sync_info = topo_print_sync_parameters;
 }
-

@@ -5,8 +5,6 @@
 #include "GlobalClockLM.hpp"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 
@@ -83,4 +81,3 @@ int GlobalClockLM::get_nested_level() {
     return 1;
   }
 }
-

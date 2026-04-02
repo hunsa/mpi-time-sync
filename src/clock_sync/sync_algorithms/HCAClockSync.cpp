@@ -10,8 +10,6 @@
 #include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
 #include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 HCAClockSync::HCAClockSync(ClockOffsetAlg *offsetAlg, int n_fitpoints) :

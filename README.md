@@ -24,6 +24,29 @@ make -j
 make install
 ```
 
+### Logging Level
+
+The library-wide compile-time log level can be configured with `LOGGING_LEVEL`.
+
+Supported values:
+- `VERBOSE`
+- `DEBUG`
+- `INFO`
+- `WARN`
+- `ERROR`
+- `NONE`
+
+Default:
+```bash
+cmake -S . -B build -DLOGGING_LEVEL=WARN
+```
+
+Example with verbose logging enabled:
+```bash
+cmake -S . -B build -DLOGGING_LEVEL=VERBOSE
+cmake --build build
+```
+
 ## Selecting a Clock Synchronization Algorithm
 
 The following clock synchronization algorithms are available:

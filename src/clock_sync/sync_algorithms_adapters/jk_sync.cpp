@@ -20,8 +20,6 @@
 #include "helpers/dict/cli_param_parser.h"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 
@@ -81,6 +79,5 @@ void register_jk_module(mpits_clocksync_t *sync_mod) {
   sync_mod->get_global_time = get_normalized_time;
   sync_mod->print_sync_info = jk_print_sync_parameters;
 }
-
 
 

@@ -10,8 +10,6 @@
 
 #include "clock_sync/sync_algorithms/utils/sync_utils.h"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 PingpongClockOffsetAlg::PingpongClockOffsetAlg(int nexchanges_rtt, int nexchanges) {
@@ -118,5 +116,4 @@ ClockOffset* PingpongClockOffsetAlg::measure_offset(MPI_Comm comm, int ref_rank,
   }
   return offset;
 }
-
 

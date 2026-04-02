@@ -7,8 +7,6 @@
 #include "TwoLevelClockSync.hpp"
 #include "time_provider/clocks/GlobalClockLM.hpp"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 TwoLevelClockSync::TwoLevelClockSync(BaseClockSync *syncInterNode, BaseClockSync *syncIntraNode) :
@@ -110,6 +108,5 @@ GlobalClock* TwoLevelClockSync::synchronize_all_clocks(MPI_Comm comm, Clock& c) 
 
   return global_clock2;
 }
-
 
 

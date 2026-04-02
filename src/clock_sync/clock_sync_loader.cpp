@@ -23,8 +23,6 @@
 #include "helpers/dict/cli_param_parser.h"
 
 
-#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-//#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 static std::vector<std::string> str_split(const char *str, char c);
@@ -207,5 +205,4 @@ BaseClockSync* ClockSyncLoader::instantiate_clock_sync(MPI_Comm comm, const char
 
   return ret_sync;
 }
-
 

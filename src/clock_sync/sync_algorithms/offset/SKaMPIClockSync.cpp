@@ -15,8 +15,6 @@
 #include "clock_sync/clock_offset_algs/PingpongClockOffsetAlg.hpp"
 #include "clock_sync/clock_offset_algs/SKaMPIClockOffsetAlg.hpp"
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 SKaMPIClockSync::SKaMPIClockSync(ClockOffsetAlg *offsetAlg) {
@@ -117,5 +115,4 @@ GlobalClock* SKaMPIClockSync::synchronize_all_clocks(MPI_Comm comm, Clock& c) {
 GlobalClock* SKaMPIClockSync::create_global_dummy_clock(MPI_Comm comm, Clock& c) {
   return new GlobalClockOffset(c, 0.0);
 }
-
 

@@ -6,8 +6,6 @@
 #include <cstdlib>
 #include <mpi.h>
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 void create_intranode_communicator(MPI_Comm old_comm, MPI_Comm *new_comm) {
@@ -65,4 +63,3 @@ void print_comm_debug_info(const char *tag, MPI_Comm comm1, MPI_Comm comm2) {
   ZF_LOGV("%s: comm1: rank=%d (%d), comm2: rank=%d (%d)", tag, rank1, size1, rank2, size2);
 
 }
-

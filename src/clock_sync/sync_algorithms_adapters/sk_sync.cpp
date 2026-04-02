@@ -31,8 +31,6 @@
 #include "helpers/dict/cli_param_parser.h"
 
 
-//#define ZF_LOG_LEVEL ZF_LOG_VERBOSE
-#define ZF_LOG_LEVEL ZF_LOG_WARN
 #include "log/zf_log.h"
 
 
